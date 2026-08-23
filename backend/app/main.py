@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.config import settings
-from app.routers import chat
+from app.routers import chat, recommendations
 
 app = FastAPI(title="PathFinder AI service")
 
@@ -15,6 +15,7 @@ app.add_middleware(
 )
 
 app.include_router(chat.router)
+app.include_router(recommendations.router)
 
 
 @app.exception_handler(HTTPException)
