@@ -1,0 +1,15 @@
+# Scratch log
+
+Running notes and in-progress thinking for the PathFinder Round 2 project.
+Not a source of truth — once a decision is settled, promote it to docs/adr/ and trim the note here.
+
+## 2026-08-22
+- Round 2 problem statement, judging criteria, and org's own submission tips confirmed via docs/reference/ screenshots and the live portal.
+- Portal bug: "Marked as submitted" shows green even with all 5 deliverable fields empty — verify actual field contents before the deadline, don't trust the flag.
+- Full planning pass complete: stack, LLM provider, recommendation engine, service boundary, auth, and the multi-agent workflow are all recorded in docs/adr/0001-0006.
+- git initialized locally. Not yet connected to a GitHub remote.
+
+## Open, not yet resolved
+- GitHub: does a repo already exist for this project, or does one need creating? (Needed before FE/BE agents can open real PRs — Slice 0 is blocked on this.)
+- Supabase: is there an existing account/project, or does one need creating? (Needed before the schema migration can actually be applied and FastAPI can connect.)
+- Once both exist: get the Supabase connection details (Supavisor pooler host/port, project ref) and add them as secrets in Render + a local `.env` (never committed).
