@@ -16,7 +16,7 @@ from google.genai import types
 
 from app.config import settings
 
-MODEL_NAME = "gemini-2.0-flash-lite"
+MODEL_NAME = "gemini-3.5-flash-lite"
 
 SYSTEM_INSTRUCTION = """You are the intake assistant for PathFinder, a learning-path \
 recommender. Hold a short, friendly conversation with a learner to figure out enough \
@@ -43,29 +43,34 @@ Never mention that you are extracting structured data or reference field names.
 
 Respond with JSON only, matching the provided schema."""
 
-_PROFILE_PATCH_SCHEMA = types.Schema(
-    type="OBJECT",
-    properties={
-        "goal": types.Schema(type="STRING"),
-        "interests": types.Schema(type="ARRAY", items=types.Schema(type="STRING")),
-        "experienceLevel": types.Schema(
-            type="STRING",
-            enum=["beginner", "intermediate", "advanced"],
-        ),
-        "completedCourseIds": types.Schema(type="ARRAY", items=types.Schema(type="STRING")),
-        "timeBudgetHoursPerWeek": types.Schema(type="INTEGER"),
+_PROFILE_PATCH_SCHEMA = {
+    "type": "OBJECT",
+    "properties": {
+        "goal": {"type": "STRING"},
+        "interests": {"type": "ARRAY", "items": {"type": "STRING"}},
+        "experienceLevel": {
+            "type": "STRING",
+            "enum": ["beginner", "intermediate", "advanced"],
+        },
+        "completedCourseIds": {"type": "ARRAY", "items": {"type": "STRING"}},
+        "timeBudgetHoursPerWeek": {"type": "INTEGER"},
     },
-)
+}
 
-_RESPONSE_SCHEMA = types.Schema(
-    type="OBJECT",
-    properties={
-        "reply": types.Schema(type="STRING"),
+# response_schema must be a plain dict here, not a types.Schema instance — this
+# SDK version's t_schema() only passes dicts through untouched; anything else
+# gets routed through `.model_json_schema()`, which (since Schema is itself a
+# pydantic model) describes Schema's own shape instead of ours and crashes.
+# See google/genai/_transformers.py: t_schema() / process_schema().
+_RESPONSE_SCHEMA = {
+    "type": "OBJECT",
+    "properties": {
+        "reply": {"type": "STRING"},
         "profilePatch": _PROFILE_PATCH_SCHEMA,
-        "profileComplete": types.Schema(type="BOOLEAN"),
+        "profileComplete": {"type": "BOOLEAN"},
     },
-    required=["reply", "profilePatch", "profileComplete"],
-)
+    "required": ["reply", "profilePatch", "profileComplete"],
+}
 
 
 class GeminiIntakeError(RuntimeError):
