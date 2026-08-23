@@ -15,7 +15,15 @@ Not a source of truth — once a decision is settled, promote it to docs/adr/ an
 - PR #1 (scaffold) and PR #3 (catalog seed data, rebased after #1 merged since its original base branch was deleted) both merged into main. Local main synced, stale branches cleaned up.
 - Supabase setup explicitly deferred by the user ("let's do it afterwards") — migration/seed files exist but nothing's been applied anywhere yet.
 
+## 2026-08-23 (cont.)
+- Slices 1 (FE catalog) and 2 (BE chat intake) both completed and PR'd (#5, #4). The process crashed mid-run and restarted; both agents had already committed and pushed before that happened, so no work was lost, but the recovery surfaced a real operational gap: this session dispatches subagents into the *same* working directory rather than isolated worktrees, and two agents doing `git checkout -b`/commit concurrently nearly collided (FE's uncommitted work got rescued via a targeted `git stash push --keep-index -- frontend/` mid-race). Worth using `isolation: "worktree"` for any future parallel agent dispatch instead.
+- Somewhere in the crash/restart, PR #4 and #5 got merged without INT ever completing a verification pass — the responsible process is unclear (possibly a pre-crash INT agent still running, possibly leftover from an earlier turn). Not reverted since the code was sound, but it's exactly the gap INT was supposed to close, and it bit us: see next line.
+- User added a real `GEMINI_API_KEY` to `backend/.env`. Live-tested `/chat/intake` for the first time and found two real bugs the mocked unit tests couldn't catch: (1) `response_schema` as a `types.Schema` instance crashes this SDK version — must be a plain dict; (2) `gemini-2.0-flash-lite` is retired, API pointed at `gemini-3.5-flash-lite`. Fixed both, verified live call + tests both pass, PR #6 opened.
+- Separately: `gh pr merge` is blocked by Claude Code's own auto-mode safety classifier (harness-level, not a CLAUDE.md setting) — PRs can be opened but not merged from here. #6 needs a manual merge.
+- Self-inflicted near-miss: ran `git checkout main && git reset --hard origin/main` while my own uncommitted fix was sitting in the working tree, wiping it. Recovered by reapplying the same two-line fix from memory since I'd just written and verified it, but the lesson is to check `git status`/stash before any `reset --hard`, full stop.
+
 ## Open, not yet resolved
-- Supabase: account/project creation deferred, revisit when the user is ready. Blocks: applying the schema migration, running the catalog seed, FastAPI having anything to actually query.
+- Supabase: account/project creation deferred, revisit when the user is ready. Blocks: applying the schema migration, running the catalog seed, FastAPI having anything to actually query against live data.
 - Vercel/Render aren't yet linked to this specific GitHub repo — dashboard action on the user's side, not yet started.
-- Starting Slice 1 (catalog API + browse UI) now — FE can build the browse UI against the contract with local mock data in the meantime; BE's catalog endpoint needs Supabase to return anything real.
+- PR #6 (Gemini live-API fix) needs a manual merge — blocked by the harness classifier, not by review.
+- Future parallel agent dispatch should use worktree isolation to avoid a repeat of the branch-collision near-miss above.
