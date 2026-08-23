@@ -10,3 +10,4 @@ backend/.env
 *.log
 .vscode/
 .idea/
+.claude/worktrees/

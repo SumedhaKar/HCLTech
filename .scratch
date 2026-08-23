@@ -22,8 +22,15 @@ Not a source of truth — once a decision is settled, promote it to docs/adr/ an
 - Separately: `gh pr merge` is blocked by Claude Code's own auto-mode safety classifier (harness-level, not a CLAUDE.md setting) — PRs can be opened but not merged from here. #6 needs a manual merge.
 - Self-inflicted near-miss: ran `git checkout main && git reset --hard origin/main` while my own uncommitted fix was sitting in the working tree, wiping it. Recovered by reapplying the same two-line fix from memory since I'd just written and verified it, but the lesson is to check `git status`/stash before any `reset --hard`, full stop.
 
+## 2026-08-23 (cont. 2)
+- PR #6 merged (manually, after the harness classifier blocked `gh pr merge`).
+- Turns out Slice 3 (recommendation engine + profile/path CRUD) had *already* been dispatched before the crash, sitting uncommitted in two isolated git worktrees (`.claude/worktrees/agent-*`, branches `feat/be-recommendations` and `feat/fe-profile-path`) — correction to the note above: at least this pair of agents used real worktree isolation, not the shared directory. Whatever caused the Slice-1/2 near-miss is still worth watching for, but it isn't a blanket "this session never isolates agents" problem.
+- Finished both from where they stopped: BE's recommendation engine (rule-based filter → Gemini-embedding ranking) + path generator + `/chat/explain`, FE's learner-profile and learning-path CRUD routes. Both carried the same live-API bugs as PR #6 (schema-must-be-a-dict; retired model names) since they were written before that fix existed — same fix pattern applied, plus a third stale model found (`text-embedding-004` → `gemini-embedding-001`, confirmed via a live `ListModels` REST call rather than guessed). Also added a missing `greenlet` dependency (SQLAlchemy async needs it; surfaced as 5 failing tests until added).
+- Both rebased cleanly onto post-#6 main, tests pass (24/24 BE), builds pass (FE), live Gemini calls (chat intake, embeddings) verified working. PRs opened: **#7** (BE recommendations) and **#8** (FE profile/path). Both still need a manual merge (harness classifier).
+- Worktrees removed (`git worktree remove` for one, files were locked for the other — force-removed then `git worktree prune`), `.claude/worktrees/` added to `.gitignore` so this doesn't recur.
+
 ## Open, not yet resolved
-- Supabase: account/project creation deferred, revisit when the user is ready. Blocks: applying the schema migration, running the catalog seed, FastAPI having anything to actually query against live data.
+- Supabase: account/project creation deferred, revisit when the user is ready. Blocks: applying the schema migration, running the catalog seed, and any real end-to-end verification (recommendation generation, learning-path CRUD) against live data.
 - Vercel/Render aren't yet linked to this specific GitHub repo — dashboard action on the user's side, not yet started.
-- PR #6 (Gemini live-API fix) needs a manual merge — blocked by the harness classifier, not by review.
-- Future parallel agent dispatch should use worktree isolation to avoid a repeat of the branch-collision near-miss above.
+- PRs #7 and #8 need a manual merge — blocked by the harness classifier, not by review.
+- Recurring pattern worth naming: every Gemini-calling piece of code written *before* a live key existed has had stale model names and/or the schema-as-dict issue. If more AI-calling code gets written blind (no live key), assume it needs the same pass once it can finally be tested for real.
