@@ -9,7 +9,13 @@ Not a source of truth — once a decision is settled, promote it to docs/adr/ an
 - Full planning pass complete: stack, LLM provider, recommendation engine, service boundary, auth, and the multi-agent workflow are all recorded in docs/adr/0001-0006.
 - git initialized locally. Not yet connected to a GitHub remote.
 
+## 2026-08-23
+- GitHub repo confirmed: https://github.com/SumedhaKar/HCLTech (had a default "Initial commit" with just README.md — rebased scaffold onto it, not force-pushed).
+- `gh` CLI installed (winget) and authenticated as SumedhaKar (device-code flow).
+- PR #1 (scaffold) and PR #3 (catalog seed data, rebased after #1 merged since its original base branch was deleted) both merged into main. Local main synced, stale branches cleaned up.
+- Supabase setup explicitly deferred by the user ("let's do it afterwards") — migration/seed files exist but nothing's been applied anywhere yet.
+
 ## Open, not yet resolved
-- GitHub: does a repo already exist for this project, or does one need creating? (Needed before FE/BE agents can open real PRs — Slice 0 is blocked on this.)
-- Supabase: is there an existing account/project, or does one need creating? (Needed before the schema migration can actually be applied and FastAPI can connect.)
-- Once both exist: get the Supabase connection details (Supavisor pooler host/port, project ref) and add them as secrets in Render + a local `.env` (never committed).
+- Supabase: account/project creation deferred, revisit when the user is ready. Blocks: applying the schema migration, running the catalog seed, FastAPI having anything to actually query.
+- Vercel/Render aren't yet linked to this specific GitHub repo — dashboard action on the user's side, not yet started.
+- Starting Slice 1 (catalog API + browse UI) now — FE can build the browse UI against the contract with local mock data in the meantime; BE's catalog endpoint needs Supabase to return anything real.
