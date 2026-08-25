@@ -14,7 +14,7 @@ from typing import Any
 from google import genai
 from google.genai import types
 
-from app.config import settings
+from app.services.gemini_client import GeminiError, get_client
 
 MODEL_NAME = "gemini-3.5-flash-lite"
 
@@ -73,20 +73,15 @@ _RESPONSE_SCHEMA = {
 }
 
 
-class GeminiIntakeError(RuntimeError):
+class GeminiIntakeError(GeminiError):
     """Raised when the Gemini call fails or returns something we can't parse."""
 
 
-_client: genai.Client | None = None
-
-
 def _get_client() -> genai.Client:
-    global _client
-    if _client is None:
-        if not settings.gemini_api_key:
-            raise GeminiIntakeError("GEMINI_API_KEY is not configured")
-        _client = genai.Client(api_key=settings.gemini_api_key)
-    return _client
+    try:
+        return get_client()
+    except GeminiError as exc:
+        raise GeminiIntakeError(str(exc)) from exc
 
 
 def _build_contents(history: list[dict[str, str]], message: str) -> list[types.Content]:
