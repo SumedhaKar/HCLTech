@@ -11,3 +11,8 @@ backend/.env
 .vscode/
 .idea/
 .claude/worktrees/
+
+# impeccable design-skill session scratch (not project config)
+.impeccable/questions/
+.impeccable/sketches/
+.impeccable/live/

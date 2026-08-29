@@ -1,26 +1,94 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Ground: deep forest-charcoal, the dominant field */
+  --ground: #16211b;
+  --ground-raised: #1e2c24;
+  --ground-line: #2c3c32;
+
+  /* Signage: warm parchment-cream, the carried-panel surface */
+  --signage: #f2e9d6;
+  --signage-raised: #ffffff;
+  --signage-line: #d8c9a8;
+  --ink: #201b12;
+  --ink-muted: #5a5140;
+
+  /* Text on the dark ground, tinted warm/green — never flat gray */
+  --text: #ede6d6;
+  --text-muted: #a9b0a3;
+  --text-faint: #8a9188;
+
+  /* Blaze: rust-orange accent, the trail marker / primary action color.
+     Default is dark enough for cream text at 4.5:1; hover deepens further. */
+  --blaze: #a94a18;
+  --blaze-deep: #7e3712;
+  --blaze-pale: #f0b98a;
+
+  /* Waypoint: secondary accent, intermediate difficulty grade, links */
+  --waypoint: #4f8ba3;
+  --waypoint-deep: #3e6e82;
+
+  /* Difficulty-grade colors, reused from real trail-blaze convention.
+     Darkened from the literal hiking-blaze hues so cream numerals on top
+     clear 4.5:1 contrast. */
+  --grade-beginner: #3e5c2c;
+  --grade-intermediate: var(--waypoint-deep);
+  --grade-advanced: #2a241c;
+
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-ground: var(--ground);
+  --color-ground-raised: var(--ground-raised);
+  --color-ground-line: var(--ground-line);
+  --color-signage: var(--signage);
+  --color-signage-raised: var(--signage-raised);
+  --color-signage-line: var(--signage-line);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-text-faint: var(--text-faint);
+  --color-blaze: var(--blaze);
+  --color-blaze-deep: var(--blaze-deep);
+  --color-blaze-pale: var(--blaze-pale);
+  --color-waypoint: var(--waypoint);
+  --color-waypoint-deep: var(--waypoint-deep);
+  --color-grade-beginner: var(--grade-beginner);
+  --color-grade-intermediate: var(--grade-intermediate);
+  --color-grade-advanced: var(--grade-advanced);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-body);
+  --font-serif: var(--font-display);
+  --font-mono: var(--font-mono);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--ground);
+  color: var(--text);
+  font-family: var(--font-body), "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+}
+
+/* The one authored motion moment: a brief staggered rise-in on initial
+   paint. Additive only — content is visible by default in every browser,
+   with or without animation support, and this never gates visibility. */
+@media (prefers-reduced-motion: no-preference) {
+  .rise-in {
+    animation: rise-in 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(var(--i, 0) * 90ms);
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
