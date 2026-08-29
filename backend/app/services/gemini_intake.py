@@ -32,8 +32,10 @@ completed (leave empty unless they name specific ids).
 - timeBudgetHoursPerWeek: an integer number of hours per week the learner can study.
 
 Rules:
-1. Only include a field in profilePatch if the conversation actually supports it. Never \
-guess or invent values — omit fields you don't have evidence for.
+1. profilePatch must always include every field listed above, on every turn, with no \
+exceptions. If the conversation doesn't yet support a value for a field, set it to null \
+(or an empty array for interests/completedCourseIds) — do not leave it out. Never guess \
+or invent a value just to fill a field: a wrong invented value is worse than null.
 2. If the learner's goal or experience level is still unclear, ask one short, friendly \
 clarifying question about it in "reply" — one question at a time, don't interrogate.
 3. Set profileComplete to true only once you know the goal, the experience level, AND \
@@ -46,15 +48,23 @@ Respond with JSON only, matching the provided schema."""
 _PROFILE_PATCH_SCHEMA = {
     "type": "OBJECT",
     "properties": {
-        "goal": {"type": "STRING"},
+        "goal": {"type": "STRING", "nullable": True},
         "interests": {"type": "ARRAY", "items": {"type": "STRING"}},
         "experienceLevel": {
             "type": "STRING",
             "enum": ["beginner", "intermediate", "advanced"],
+            "nullable": True,
         },
         "completedCourseIds": {"type": "ARRAY", "items": {"type": "STRING"}},
-        "timeBudgetHoursPerWeek": {"type": "INTEGER"},
+        "timeBudgetHoursPerWeek": {"type": "INTEGER", "nullable": True},
     },
+    "required": [
+        "goal",
+        "interests",
+        "experienceLevel",
+        "completedCourseIds",
+        "timeBudgetHoursPerWeek",
+    ],
 }
 
 # response_schema must be a plain dict here, not a types.Schema instance — this
@@ -106,10 +116,22 @@ def _parse_response(raw_text: str | None) -> dict[str, Any]:
     if not isinstance(data, dict):
         raise GeminiIntakeError("Gemini response JSON was not an object")
 
+    profile_patch = data.get("profilePatch") or {}
+
+    # profileComplete is derived here rather than trusted from the model's own
+    # boolean: Gemini has been observed reporting profileComplete=true in the
+    # same response where experienceLevel is missing from profilePatch, which
+    # contradicts the completion rule in SYSTEM_INSTRUCTION. Recomputing it
+    # from the patch that was actually returned makes the two fields always
+    # consistent, regardless of what the model claims.
+    profile_complete = bool(profile_patch.get("goal")) and bool(
+        profile_patch.get("experienceLevel")
+    ) and len(profile_patch.get("interests") or []) > 0
+
     return {
         "reply": data.get("reply", ""),
-        "profilePatch": data.get("profilePatch") or {},
-        "profileComplete": bool(data.get("profileComplete", False)),
+        "profilePatch": profile_patch,
+        "profileComplete": profile_complete,
     }
 
 
