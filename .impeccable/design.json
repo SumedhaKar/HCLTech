@@ -65,6 +65,22 @@
       "description": "The one lifted surface in the system — the hero's goal-input action panel.",
       "html": "<div class=\"ds-signpost\"><p class=\"ds-signpost__label\">WHERE ARE YOU HEADED?</p></div>",
       "css": ".ds-signpost { background: #f2e9d6; color: #201b12; padding: 24px; border-radius: 2px; box-shadow: 0 18px 40px -16px rgba(0,0,0,0.55); } .ds-signpost__label { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.14em; color: #5a5140; }"
+    },
+    {
+      "name": "Chat Bubble",
+      "kind": "custom",
+      "refersTo": "chat-bubble",
+      "description": "Assistant (left, parchment) and user (right, slate blue) message bubbles.",
+      "html": "<div class=\"ds-bubble ds-bubble--assistant\">Tell me what you're trying to learn.</div>",
+      "css": ".ds-bubble { display: inline-block; max-width: 80%; padding: 10px 14px; border-radius: 2px; font-size: 0.875rem; line-height: 1.5; } .ds-bubble--assistant { background: #f2e9d6; color: #201b12; box-shadow: inset 0 0 0 1px #d8c9a8; } .ds-bubble--user { background: #3e6e82; color: #ede6d6; margin-left: auto; }"
+    },
+    {
+      "name": "Status Pill",
+      "kind": "chip",
+      "refersTo": "status-pill",
+      "description": "Multi-state selector (waypoint status). Active pill takes the one blaze accent; inactive pills are outline-only.",
+      "html": "<div><button class=\"ds-pill\">Not started</button><button class=\"ds-pill ds-pill--active\">In progress</button></div>",
+      "css": ".ds-pill { border-radius: 9999px; padding: 4px 12px; font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.05em; color: #5a5140; box-shadow: inset 0 0 0 1px #d8c9a8; background: transparent; margin-right: 6px; } .ds-pill--active { background: #a94a18; color: #f2e9d6; box-shadow: none; }"
     }
   ],
   "narrative": {

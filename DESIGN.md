@@ -159,7 +159,13 @@ Small, consistent radii throughout (`rounded-sm`, 2px) on cards, buttons, and ta
 - **Internal Padding:** generous (`24px`–`32px`) on the one lifted panel; list items use left-padding only, no card chrome.
 
 ### Waypoint Marker (signature component)
-A 40px circle in the active difficulty-blaze color, holding the route-order number in mono, Trailhead Parchment text, with the stamped-disc inset shadow. Connected to the next marker by a 1px dashed vertical line in the section's hairline color. This is the system's signature device — any future "sequence" or "progress" UI should reuse this marker language rather than inventing a new one (e.g. a progress bar or step indicator).
+A 40px circle in the active difficulty-blaze color, holding the route-order number in mono, Trailhead Parchment text, with the stamped-disc inset shadow. Connected to the next marker by a 1px dashed vertical line in the section's hairline color. This is the system's signature device — any future "sequence" or "progress" UI should reuse this marker language rather than inventing a new one (e.g. a progress bar or step indicator). Reused directly (28px, same treatment) as the "trail permit" checklist marker on the chat-intake screen, filling from an empty hairline-ring outline to a solid grade-beginner disc with an authored checkmark SVG once a field is known.
+
+### Chat Bubbles
+Assistant messages: Trailhead Parchment background, Trail Ink text, hairline ring, left-aligned. User messages: Dusk Slate Blue background, Warm Trail Cream text, right-aligned, no ring (the color alone carries the distinction). Both share the 2px radius; no tails or carets.
+
+### Status Pills
+A row of small fully-rounded pills (not the button radius) for a multi-state choice (waypoint status: not started / in progress / completed). The active pill fills with Burnt Rust Blaze and Trailhead Parchment text; inactive pills are text-only with a hairline ring. Deliberately reuses The One Blaze Rule rather than inventing status-specific colors — blaze means "the state you're in," not "success."
 
 ## Do's and Don'ts
 

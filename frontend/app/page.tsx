@@ -179,10 +179,10 @@ export default function Home() {
           route back.
         </p>
         <Link
-          href="/catalog"
+          href="/chat"
           className="mt-7 inline-flex items-center justify-center rounded-sm bg-blaze px-6 py-3 font-mono text-sm uppercase tracking-wide text-signage transition-colors hover:bg-blaze-deep"
         >
-          Explore the catalog
+          Start the conversation
         </Link>
       </section>
 
@@ -220,7 +220,7 @@ function GoalPanel() {
       </div>
 
       <Link
-        href="/catalog"
+        href="/chat"
         className="mt-6 flex w-full items-center justify-center rounded-sm bg-blaze px-5 py-3 font-mono text-sm uppercase tracking-wide text-signage transition-colors hover:bg-blaze-deep"
       >
         Find my path
