@@ -231,6 +231,7 @@ function PathItemRow({
             <button
               key={s}
               type="button"
+              aria-pressed={item.status === s}
               onClick={() => setStatus(s)}
               disabled={updating}
               className={

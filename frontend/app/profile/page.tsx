@@ -181,6 +181,7 @@ export default function ProfilePage() {
                       <button
                         key={opt.value}
                         type="button"
+                        aria-pressed={experienceLevel === opt.value}
                         onClick={() =>
                           setExperienceLevel((prev) =>
                             prev === opt.value ? null : opt.value
@@ -217,7 +218,7 @@ export default function ProfilePage() {
                           type="button"
                           onClick={() => removeInterest(interest)}
                           aria-label={`Remove ${interest}`}
-                          className="text-ink-muted hover:text-blaze-deep"
+                          className="-m-1 p-1 text-ink-muted hover:text-blaze-deep"
                         >
                           ×
                         </button>
@@ -291,7 +292,7 @@ export default function ProfilePage() {
                           type="button"
                           onClick={() => removeCourse(id)}
                           aria-label={`Remove ${courseById[id]?.title ?? id}`}
-                          className="text-ink-muted hover:text-blaze-deep"
+                          className="-m-1 p-1 text-ink-muted hover:text-blaze-deep"
                         >
                           ×
                         </button>
