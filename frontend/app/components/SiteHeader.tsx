@@ -4,6 +4,7 @@ const NAV_ITEMS = [
   { href: "/chat", label: "Chat" },
   { href: "/dashboard", label: "Dashboard" },
   { href: "/catalog", label: "Catalog" },
+  { href: "/profile", label: "Profile" },
 ] as const;
 
 export default function SiteHeader({
