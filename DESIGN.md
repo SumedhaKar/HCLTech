@@ -159,15 +159,18 @@ A field of thin, near-white lines converging toward a center point behind the ho
 
 ## The Landing Hero (homepage only)
 
-The homepage (`/`) carries a second, deliberately distinct visual layer on top of Night Trail: a pure-black, single-viewport hero built from a concrete external reference (a liquid-metal, high-craft AI-SaaS landing page) the team pointed to directly, the same way the reference for Night Trail itself was chosen. This is scoped to `/` only — `/catalog`, `/chat`, `/dashboard`, and `/profile` are unaffected and stay on Night Trail's ground/surface/blaze system, since they're Operate surfaces (task screens), not a Persuade surface (the landing page).
+The homepage (`/`) carries a second visual layer on top of Night Trail: a single-viewport hero built from a concrete external reference (a liquid-metal, high-craft AI-SaaS landing page) the team pointed to directly, the same way the reference for Night Trail itself was chosen. This is scoped to `/` only — `/catalog`, `/chat`, `/dashboard`, and `/profile` are unaffected, since they're Operate surfaces (task screens), not a Persuade surface (the landing page). Originally this layer also ran its own color palette (pure black, cool-blue-tinted glows, a white chrome primary button); that deviation was retired so the homepage reads as the same product as the rest of the app on first glance, not a different one bolted on.
 
-**What's different here, and why it doesn't leak:**
-- Pure black (`#000`) rather than Night Trail's `#0a0a0a`, Inter + Instrument Serif (italic accent word only) rather than Zilla Slab/Archivo, liquid-metal gradient nav pills and glass buttons rather than pill/blaze buttons — implemented as a CSS Module (`page.module.css`) plus two small client components (`HeaderNav.tsx`, `AppearFallback.tsx`), never in `globals.css`, so none of it can bleed into the app screens.
+**What's shared with Night Trail now:**
+- Colors: the hero's local tokens (`--bg`, `--muted`, `--border`, plus every button and glow) resolve to the same root custom properties as the rest of the app (`--ground`, `--text`, `--text-muted`, `--surface`, `--border-strong`, `--blaze`) — set once in `globals.css` and inherited into the CSS Module rather than redeclared. The primary CTA is Blaze-filled like every other primary button in the product; the ghost/secondary button and nav pills use neutral white-based glass rather than the old cool-blue-tinted hover glow, since Blaze is reserved for the primary action per the One-Glow Rule.
+
+**What's still different here, and why it doesn't leak:**
+- Inter + Instrument Serif (italic accent word only) rather than Zilla Slab/Archivo, liquid-metal gradient nav pills and glass buttons rather than Night Trail's flat pill/border components — implemented as a CSS Module (`page.module.css`) plus two small client components (`HeaderNav.tsx`, `AppearFallback.tsx`), never in `globals.css`, so none of it can bleed into the app screens.
 - Single viewport, no scroll, on desktop (`.page` locks to `100dvh` with `overflow: hidden` above 900px); scrolls normally on phone.
 - A staggered entrance choreography (badge → masked headline lines → lede → CTAs → stats) plays once on load, gated by `prefers-reduced-motion` and backstopped by a fallback that force-reveals everything if the animation never actually runs.
 - The three footer stats are real product facts (course count, domain count, grading mechanism, the personalization guarantee), not adoption/traction numbers — the reference's stats implied user counts PathFinder doesn't have, so they were replaced with things that are true by construction rather than invented social proof.
 
-**Named Rule — The One-Surface Exception:** the landing hero is the only page in the system allowed to deviate from Night Trail's tokens and type system. Any other page reached by navigation (catalog, chat, dashboard, profile) must stay on Night Trail; don't extend the black/liquid-metal system past `/`.
+**Named Rule — The One-Surface Exception (type and shape only):** the landing hero is the only page in the system allowed to deviate from Night Trail's type family and component shapes (Inter/Instrument Serif, glass buttons, liquid-metal nav pills). It no longer deviates on color — don't reintroduce a separate color palette here, and don't extend the type/shape exception past `/`.
 
 ## Do's and Don'ts
 
@@ -183,4 +186,5 @@ The homepage (`/`) carries a second, deliberately distinct visual layer on top o
 - **Don't** use a black drop shadow on a near-black ground — it disappears; use the blaze glow or a border instead.
 - **Don't** bring back a light/cream "signage" surface anywhere, including for inputs or nested chips.
 - **Don't** fabricate integration/partner logos the reference uses to imply endorsements PathFinder doesn't have — the logo strip is adapted as a plain real-course-domain-count line instead.
-- **Don't** extend the landing hero's black/liquid-metal system past `/` (The One-Surface Exception) — and don't invent adoption/traction stats there; every stat must be a true product fact.
+- **Don't** extend the landing hero's Inter/Instrument-Serif type or liquid-metal component shapes past `/` (The One-Surface Exception) — and don't invent adoption/traction stats there; every stat must be a true product fact.
+- **Don't** give the landing hero its own color palette again — its tokens must resolve to the same root custom properties (`--ground`, `--text`, `--blaze`, etc.) as the rest of the app, not a separate pure-black/cool-tinted set.

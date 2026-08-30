@@ -5,12 +5,17 @@
    standard Night Trail dark-ground system. */
 
 .page {
-  --bg: #000000;
-  --text: #ffffff;
-  --muted: #9a9a9a;
-  --stat: #d8d8d8;
-  --border: rgba(255, 255, 255, 0.16);
-  --border-soft: rgba(255, 255, 255, 0.12);
+  /* Shared with the rest of the product via globals.css :root — this is
+     what makes the landing page read as the same product as catalog/
+     chat/dashboard/profile, not a separate visual world stitched on. */
+  --bg: var(--ground);
+  /* No local --text override: inherits the root --text token directly
+     (redeclaring it under the same name here would be a self-referential
+     cycle, which CSS resolves to an invalid value). */
+  --muted: var(--text-muted);
+  --stat: #c9c9c0;
+  --border: rgba(245, 245, 242, 0.16);
+  --border-soft: rgba(245, 245, 242, 0.12);
 
   --logo: 15.5px;
   --logo-mark: 22px;
@@ -96,7 +101,7 @@
   font-size: var(--logo);
   font-weight: 600;
   letter-spacing: -0.03em;
-  color: #fff;
+  color: var(--text);
 }
 
 .logoSuffix {
@@ -118,9 +123,9 @@
   align-items: center;
   padding: 0 18px;
   border-radius: 7px;
-  border: 1px solid rgba(198, 198, 198, 0.55);
-  background: linear-gradient(105deg, #050505 0%, #2a2a2a 48%, #4a4a4a 100%);
-  color: #f3f3f3;
+  border: 1px solid rgba(210, 208, 195, 0.4);
+  background: linear-gradient(105deg, var(--ground) 0%, var(--surface) 48%, var(--border-strong) 100%);
+  color: var(--text);
   font-size: var(--nav);
   font-weight: 400;
   letter-spacing: -0.01em;
@@ -138,9 +143,9 @@
 }
 
 .navLink:hover {
-  border-color: rgba(235, 235, 235, 0.9);
-  background: linear-gradient(105deg, #111 0%, #3a3a3a 45%, #6a6a6a 100%);
-  box-shadow: 0 0 18px rgba(200, 210, 230, 0.18);
+  border-color: rgba(232, 228, 210, 0.75);
+  background: linear-gradient(105deg, var(--surface) 0%, var(--border-strong) 45%, #5a5a4a 100%);
+  box-shadow: 0 0 18px rgba(255, 255, 255, 0.12);
 }
 
 .navLink:hover::before {
@@ -182,7 +187,7 @@
   width: 16px;
   height: 1.5px;
   border-radius: 1px;
-  background: #fff;
+  background: var(--text);
   transition: transform 0.25s ease, opacity 0.2s ease;
 }
 
@@ -232,29 +237,29 @@
 }
 
 .btnSolid {
-  background: linear-gradient(180deg, #ffffff 0%, #e7e7e7 48%, #cfcfcf 100%);
-  color: #111;
-  border: 1px solid #fff;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  background: linear-gradient(180deg, var(--blaze-glow) 0%, var(--blaze) 55%, var(--blaze-deep) 100%);
+  color: var(--text);
+  border: 1px solid var(--blaze-glow);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 .btnSolid:hover {
-  background: linear-gradient(180deg, #fff 0%, #f3f6ff 42%, #d5def2 100%);
-  border-color: #f2f6ff;
-  box-shadow: inset 0 1px 0 #fff, 0 0 22px rgba(186, 208, 255, 0.35), 0 8px 18px rgba(255, 255, 255, 0.12);
+  background: linear-gradient(180deg, var(--blaze-glow) 0%, var(--blaze) 45%, var(--blaze-deep) 100%);
+  border-color: var(--blaze-glow);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 0 22px rgba(224, 136, 56, 0.45), 0 8px 18px rgba(224, 136, 56, 0.18);
 }
 
 .btnGhost {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.45) 50%, rgba(160, 175, 200, 0.08));
-  color: #fff;
-  border: 1px solid rgba(198, 198, 198, 0.45);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(10, 10, 8, 0.45) 50%, rgba(255, 255, 255, 0.05));
+  color: var(--text);
+  border: 1px solid rgba(210, 208, 195, 0.4);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 .btnGhost:hover {
-  background: linear-gradient(135deg, rgba(210, 225, 255, 0.18), rgba(0, 0, 0, 0.35) 48%, rgba(180, 195, 220, 0.16));
-  border-color: rgba(220, 230, 255, 0.75);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 0 20px rgba(170, 200, 255, 0.22);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(10, 10, 8, 0.35) 48%, rgba(255, 255, 255, 0.1));
+  border-color: rgba(232, 228, 210, 0.6);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
 .heroBtn {
@@ -263,19 +268,19 @@
 }
 
 .heroBtn.btnSolid:hover {
-  box-shadow: inset 0 1px 0 #fff, 0 0 26px rgba(186, 208, 255, 0.4), 0 8px 18px rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 0 26px rgba(224, 136, 56, 0.5), 0 8px 18px rgba(224, 136, 56, 0.2);
 }
 
 .heroBtn.btnGhost {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(0, 0, 0, 0.5) 46%, rgba(150, 170, 200, 0.1));
-  border: 1px solid rgba(198, 198, 198, 0.55);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(10, 10, 8, 0.5) 46%, rgba(255, 255, 255, 0.06));
+  border: 1px solid rgba(210, 208, 195, 0.45);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 }
 
 .heroBtn.btnGhost:hover {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 0 24px rgba(170, 200, 255, 0.28);
-  border-color: rgba(220, 230, 255, 0.8);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  border-color: rgba(232, 228, 210, 0.65);
 }
 
 /* ---------- Hero ---------- */
@@ -308,8 +313,8 @@
   margin-bottom: 22px;
   padding: 9px 15px;
   border-radius: 5px;
-  background: linear-gradient(90deg, #7d7d7d 0%, #2a2a2a 52%, #0a0a0a 100%);
-  color: #f2f2f2;
+  background: linear-gradient(90deg, #7d7d7d 0%, var(--surface) 52%, var(--ground) 100%);
+  color: var(--text);
   font-size: var(--badge);
   font-weight: 400;
   letter-spacing: -0.01em;
@@ -325,7 +330,7 @@
   font-weight: 500;
   letter-spacing: -0.045em;
   line-height: 1.12;
-  color: #fff;
+  color: var(--text);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -637,9 +642,9 @@
     height: 56px;
     border-radius: 10px;
     font-size: 19px;
-    color: #fff;
-    border: 1px solid rgba(198, 198, 198, 0.35);
-    background: linear-gradient(105deg, #0a0a0a 0%, #2a2a2a 60%, #3f3f3f 100%);
+    color: var(--text);
+    border: 1px solid rgba(210, 208, 195, 0.3);
+    background: linear-gradient(105deg, var(--ground) 0%, var(--surface) 60%, var(--border-strong) 100%);
   }
 }
 

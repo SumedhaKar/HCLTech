@@ -75,6 +75,28 @@ def _known_skills(completed_courses: List[Course]) -> set[str]:
 
 _MIN_MATCH_LENGTH = 3
 
+# Catalog skill tags are named after specific technologies (nodejs, mongodb,
+# sql-basics) rather than the broader category words a learner naturally
+# types (API, database, backend) — plain substring matching finds nothing in
+# common, even though the courses are exactly what the learner wants (e.g.
+# the "become a backend engineer" reference persona's own stated interests,
+# "APIs" and "databases", matched zero courses before this map existed).
+# Deliberately a small, explicit, reviewed list rather than free-text
+# title/description search: see _matches_interest for why that was tried and
+# reverted (generic words false-matching unrelated descriptions). An alias
+# entry only ever points at real tags already in the catalog, so it can't
+# introduce that same risk.
+_INTEREST_ALIASES: dict[str, tuple[str, ...]] = {
+    "api": ("nodejs", "express", "graphql"),
+    "apis": ("nodejs", "express", "graphql"),
+    "database": ("sql-basics", "mongodb"),
+    "databases": ("sql-basics", "mongodb"),
+    "backend": ("nodejs", "express", "mongodb", "sql-basics"),
+    "back-end": ("nodejs", "express", "mongodb", "sql-basics"),
+    "frontend": ("html-css", "react", "javascript-basics", "typescript"),
+    "front-end": ("html-css", "react", "javascript-basics", "typescript"),
+}
+
 
 def _matches_interest(course: Course, interests_lower: set[str]) -> bool:
     # Domain and skill tags only — title/description text was tried and
@@ -95,6 +117,9 @@ def _matches_interest(course: Course, interests_lower: set[str]) -> bool:
             if len(field) < _MIN_MATCH_LENGTH:
                 continue
             if interest in field or field in interest:
+                return True
+        for alias_tag in _INTEREST_ALIASES.get(interest, ()):
+            if alias_tag in fields:
                 return True
     return False
 

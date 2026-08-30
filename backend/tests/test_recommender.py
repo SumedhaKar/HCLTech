@@ -196,6 +196,29 @@ def test_filter_ignores_single_letter_skill_tag_false_positives():
     assert {c.id for c in result} == {"mkt1"}
 
 
+def test_filter_matches_generic_interest_words_via_alias_to_specific_tags():
+    # Regression test: the confirmed demo persona (PRODUCT.md) states
+    # interests as "APIs" and "databases" — generic category words with no
+    # substring overlap with the catalog's technology-specific skill tags
+    # (nodejs, mongodb, sql-basics). Without an alias, this persona matched
+    # zero courses despite the catalog having exactly the right ones.
+    profile = LearnerProfile(
+        goal="become a backend engineer",
+        interests=["APIs", "databases"],
+        experience_level="beginner",
+        completed_course_ids=[],
+    )
+    courses = [
+        _course(id="node", title="Node.js, Express, MongoDB & More", domain="Web Development", level="intermediate", skills_taught=["nodejs", "express", "mongodb"]),
+        _course(id="sql", title="Introduction to SQL", domain="Programming Fundamentals", level="beginner", skills_taught=["sql-basics"]),
+        _course(id="css", title="CSS Grid & Flexbox Mastery", domain="Web Development", level="beginner", skills_taught=["html-css"]),
+    ]
+
+    result = filter_candidates(profile, courses)
+
+    assert {c.id for c in result} == {"node", "sql"}
+
+
 def test_build_learning_path_ranks_by_similarity_and_orders_by_level(monkeypatch: pytest.MonkeyPatch):
     profile = LearnerProfile(
         goal="become a data analyst",
