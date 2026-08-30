@@ -156,27 +156,27 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex flex-1 flex-col bg-signage text-ink">
+    <div className="flex flex-1 flex-col bg-ground text-text">
       <SiteHeader active="/chat" />
 
       <div className="mx-auto grid w-full max-w-5xl flex-1 grid-cols-1 gap-6 px-6 py-8 sm:px-10 lg:grid-cols-[1.6fr_1fr] lg:items-start">
         {/* Conversation */}
-        <div className="flex h-[65vh] flex-col rounded-sm bg-signage-raised ring-1 ring-signage-line lg:h-[70vh]">
+        <div className="flex h-[65vh] flex-col rounded-[20px] bg-surface ring-1 ring-border lg:h-[70vh]">
           <ul ref={listRef} className="flex flex-1 flex-col gap-3 overflow-y-auto p-4">
             {messages.map((m, i) => (
               <li
                 key={i}
                 className={
                   m.role === "user"
-                    ? "ml-auto max-w-[80%] rounded-sm bg-waypoint-deep px-3.5 py-2.5 text-base leading-7 text-signage"
-                    : "mr-auto max-w-[80%] rounded-sm bg-signage px-3.5 py-2.5 text-base leading-7 text-ink ring-1 ring-signage-line"
+                    ? "ml-auto max-w-[80%] rounded-2xl bg-blaze px-3.5 py-2.5 text-base leading-7 text-text"
+                    : "mr-auto max-w-[80%] rounded-2xl bg-surface-raised px-3.5 py-2.5 text-base leading-7 text-text ring-1 ring-border"
                 }
               >
                 {m.content}
               </li>
             ))}
             {sending && (
-              <li className="mr-auto max-w-[80%] rounded-sm bg-signage px-3.5 py-2.5 font-mono text-xs uppercase tracking-wide text-ink-muted ring-1 ring-signage-line">
+              <li className="mr-auto max-w-[80%] rounded-2xl bg-surface-raised px-3.5 py-2.5 font-mono text-xs uppercase tracking-wide text-text-faint ring-1 ring-border">
                 Thinking…
               </li>
             )}
@@ -184,7 +184,7 @@ export default function ChatPage() {
 
           <form
             onSubmit={sendMessage}
-            className="flex gap-2 border-t border-signage-line p-3"
+            className="flex gap-2 border-t border-border p-3"
           >
             <input
               type="text"
@@ -192,12 +192,12 @@ export default function ChatPage() {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Describe your goal…"
               disabled={sending}
-              className="flex-1 rounded-sm bg-signage px-3 py-2.5 text-sm text-ink placeholder:text-ink-muted ring-1 ring-signage-line focus:outline-none focus:ring-2 focus:ring-waypoint-deep"
+              className="flex-1 rounded-full bg-surface-raised px-4 py-2.5 text-sm text-text placeholder:text-text-faint ring-1 ring-border focus:outline-none focus:ring-2 focus:ring-blaze"
             />
             <button
               type="submit"
               disabled={sending || !input.trim()}
-              className="rounded-sm bg-blaze px-4 py-2.5 font-mono text-xs uppercase tracking-wide text-signage transition-colors hover:bg-blaze-deep disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-full bg-blaze px-4 py-2.5 font-mono text-xs uppercase tracking-wide text-text transition-[background-color,box-shadow] hover:bg-blaze-deep hover:shadow-[0_0_0_1px_rgba(224,136,56,0.4),0_8px_20px_-8px_rgba(224,136,56,0.5)] disabled:cursor-not-allowed disabled:opacity-50"
             >
               Send
             </button>
@@ -205,11 +205,11 @@ export default function ChatPage() {
         </div>
 
         {/* Trail permit checklist */}
-        <div className="rounded-sm bg-signage-raised p-6 shadow-[0_18px_40px_-16px_rgba(0,0,0,0.55)] ring-1 ring-signage-line">
-          <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink-muted">
+        <div className="rounded-[20px] bg-surface p-6 ring-1 ring-border">
+          <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-text-muted">
             Trail permit
           </p>
-          <p className="mt-1 text-sm leading-6 text-ink-muted">
+          <p className="mt-1 text-sm leading-6 text-text-muted">
             Four things PathFinder needs before it can mark a route.
           </p>
 
@@ -222,10 +222,10 @@ export default function ChatPage() {
                   <span
                     className={
                       filled
-                        ? `mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-grade-beginner text-signage shadow-[inset_0_2px_3px_rgba(0,0,0,0.35),inset_0_-1px_1px_rgba(255,255,255,0.15)] ${
+                        ? `mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-grade-beginner text-ground ${
                             stampedKeys.has(field.key) ? "stamp" : ""
                           }`
-                        : "mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-ink-muted ring-1 ring-signage-line"
+                        : "mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-text-faint ring-1 ring-border"
                     }
                     aria-hidden
                   >
@@ -246,11 +246,11 @@ export default function ChatPage() {
                     )}
                   </span>
                   <div>
-                    <p className="font-mono text-[11px] uppercase tracking-wide text-ink-muted">
+                    <p className="font-mono text-[11px] uppercase tracking-wide text-text-muted">
                       {field.label}
                     </p>
-                    <p className="text-sm leading-5 text-ink">
-                      {value ?? <span className="text-ink-muted">not yet known</span>}
+                    <p className="text-sm leading-5 text-text">
+                      {value ?? <span className="text-text-faint">not yet known</span>}
                     </p>
                   </div>
                 </li>
@@ -263,7 +263,7 @@ export default function ChatPage() {
               type="button"
               onClick={generatePath}
               disabled={generating}
-              className="mt-6 flex w-full items-center justify-center rounded-sm bg-blaze px-5 py-3 font-mono text-sm uppercase tracking-wide text-signage transition-colors hover:bg-blaze-deep disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-6 flex w-full items-center justify-center rounded-full bg-blaze px-5 py-3 font-mono text-sm uppercase tracking-wide text-text transition-[background-color,box-shadow] hover:bg-blaze-deep hover:shadow-[0_0_0_1px_rgba(224,136,56,0.4),0_10px_28px_-8px_rgba(224,136,56,0.5)] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {generating ? "Marking your route…" : "Generate my path"}
             </button>
@@ -272,7 +272,7 @@ export default function ChatPage() {
       </div>
 
       {error && (
-        <p className="mx-6 mb-6 rounded-sm bg-blaze-pale/30 px-3 py-2.5 text-sm text-blaze-deep ring-1 ring-blaze-pale sm:mx-10">
+        <p className="mx-6 mb-6 rounded-xl bg-blaze/10 px-3 py-2.5 text-sm text-blaze-glow ring-1 ring-blaze/30 sm:mx-10">
           {error}
         </p>
       )}

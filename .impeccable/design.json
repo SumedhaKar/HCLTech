@@ -1,35 +1,36 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-08-29T00:00:00Z",
+  "generatedAt": "2026-08-30T00:00:00Z",
   "title": "Design System: PathFinder",
   "extensions": {
     "colorMeta": {
-      "ground": { "role": "neutral", "displayName": "Deep Forest Charcoal", "canonical": "#16211b" },
-      "ground-raised": { "role": "neutral", "displayName": "Raised Forest Panel", "canonical": "#1e2c24" },
-      "signage": { "role": "neutral", "displayName": "Trailhead Parchment", "canonical": "#f2e9d6" },
-      "signage-raised": { "role": "neutral", "displayName": "Signage White", "canonical": "#ffffff" },
-      "ink": { "role": "neutral", "displayName": "Trail Ink", "canonical": "#201b12" },
-      "text": { "role": "neutral", "displayName": "Warm Trail Cream", "canonical": "#ede6d6" },
-      "blaze": { "role": "primary", "displayName": "Burnt Rust Blaze", "canonical": "#a94a18" },
-      "blaze-deep": { "role": "primary", "displayName": "Deep Rust Blaze", "canonical": "#7e3712" },
-      "waypoint-deep": { "role": "secondary", "displayName": "Dusk Slate Blue", "canonical": "#3e6e82" },
-      "grade-beginner": { "role": "tertiary", "displayName": "Moss Trail Green", "canonical": "#3e5c2c" },
-      "grade-advanced": { "role": "tertiary", "displayName": "Black Diamond Charcoal", "canonical": "#2a241c" }
+      "ground": { "role": "neutral", "displayName": "Night Ground", "canonical": "#0a0a0a" },
+      "ground-raised": { "role": "neutral", "displayName": "Raised Night Ground", "canonical": "#141412" },
+      "surface": { "role": "neutral", "displayName": "Surface", "canonical": "#161613" },
+      "surface-raised": { "role": "neutral", "displayName": "Raised Surface", "canonical": "#1d1d19" },
+      "border": { "role": "neutral", "displayName": "Hairline Border", "canonical": "#2c2c26" },
+      "border-strong": { "role": "neutral", "displayName": "Strong Border", "canonical": "#3d3d35" },
+      "text": { "role": "neutral", "displayName": "Headlamp White", "canonical": "#f5f5f2" },
+      "blaze": { "role": "primary", "displayName": "Night Blaze", "canonical": "#a94a18" },
+      "blaze-deep": { "role": "primary", "displayName": "Deep Night Blaze", "canonical": "#7e3712" },
+      "blaze-glow": { "role": "primary", "displayName": "Blaze Glow", "canonical": "#e08838" },
+      "grade-beginner": { "role": "tertiary", "displayName": "Light Trail", "canonical": "#e5e5df" },
+      "grade-intermediate": { "role": "tertiary", "displayName": "Mid Trail", "canonical": "#8a8a80" },
+      "grade-advanced": { "role": "tertiary", "displayName": "Dark Trail", "canonical": "#1a1a16" }
     },
     "typographyMeta": {
-      "display": { "displayName": "Display", "purpose": "Hero headline, section headings, card titles." },
-      "body": { "displayName": "Body", "purpose": "Paragraph copy." },
+      "display": { "displayName": "Display", "purpose": "Hero headline (700), section headings and card titles (600)." },
+      "body": { "displayName": "Body", "purpose": "Paragraph copy and reading content (chat bubbles, explainer answers)." },
       "label": { "displayName": "Label", "purpose": "Domain tags, milestone chips, grade labels, footer line." }
     },
     "shadows": [
-      { "name": "signpost-lift", "value": "0 18px 40px -16px rgba(0,0,0,0.55)", "purpose": "The hero action panel only." },
-      { "name": "stamped-disc", "value": "inset 0 2px 3px rgba(0,0,0,0.35), inset 0 -1px 1px rgba(255,255,255,0.15)", "purpose": "Numbered waypoint markers only." }
+      { "name": "blaze-glow", "value": "0 0 0 1px rgba(224,136,56,0.4), 0 8px 24px -8px rgba(224,136,56,0.45)", "purpose": "The one elevation device in the system: primary button hover/focus and the stamped-confirmation motion." }
     ],
     "motion": [
-      { "name": "rise-in", "value": "700ms cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "One-time staggered entrance for route waypoints on initial paint. Additive only — never gates visibility, disabled under prefers-reduced-motion." },
-      { "name": "trail-draw", "value": "500ms cubic-bezier(0.16, 1, 0.3, 1), scaleY 0->1, transform-origin top", "purpose": "The dashed connector between homepage waypoints draws in from its marker rather than appearing all at once. Homepage only." },
-      { "name": "stamp", "value": "480ms cubic-bezier(0.16, 1, 0.3, 1), scale 1->1.22->0.94->1 with a shadow punch", "purpose": "Physical confirmation feedback when a waypoint marker's state actually changes: a chat-intake checklist field becoming known, or a dashboard path item marked Completed. Additive only — end state is identical without it." },
-      { "name": "contour-drift", "value": "animation-timeline: scroll(root block), translate3d drift", "purpose": "Homepage hero contour lines drift slowly as the visitor scrolls. Wrapped in @supports; degrades to the static lines with no motion on browsers without scroll-driven animation support." }
+      { "name": "rise-in", "value": "700ms cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "One-time staggered entrance for route waypoints on initial paint. Additive only." },
+      { "name": "trail-draw", "value": "500ms cubic-bezier(0.16, 1, 0.3, 1), scaleY 0->1", "purpose": "The dashed connector between homepage waypoints draws in from its marker." },
+      { "name": "stamp", "value": "480ms cubic-bezier(0.16, 1, 0.3, 1), scale 1->1.22->0.94->1 with a blaze-glow punch", "purpose": "Physical confirmation feedback when a waypoint marker's state actually changes." },
+      { "name": "line-field", "value": "server-rendered SVG paths, CSS breathing transform (scale 1->1.03, 9s), paused under prefers-reduced-motion", "purpose": "Homepage hero generative line field — the adapted version of the reference's thread/vortex visual. SVG rather than canvas so the shape is in the static markup with no client JS." }
     ],
     "breakpoints": [
       { "name": "sm", "value": "640px" },
@@ -41,79 +42,87 @@
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "The single call-to-action treatment. Mono uppercase label, tracked.",
+      "description": "The single call-to-action treatment. Fully rounded, mono uppercase label, blaze glow on hover.",
       "html": "<a class=\"ds-btn-primary\" href=\"#\">FIND MY PATH</a>",
-      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; background: #a94a18; color: #f2e9d6; padding: 12px 24px; border-radius: 2px; font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; transition: background 0.2s; } .ds-btn-primary:hover { background: #7e3712; } .ds-btn-primary:focus-visible { outline: 2px solid #f0b98a; outline-offset: 2px; }"
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; background: #a94a18; color: #f5f5f2; padding: 12px 24px; border-radius: 9999px; font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; transition: background 0.2s, box-shadow 0.2s; } .ds-btn-primary:hover { background: #7e3712; box-shadow: 0 0 0 1px rgba(224,136,56,0.4), 0 8px 24px -8px rgba(224,136,56,0.45); }"
     },
     {
-      "name": "Goal Chip",
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Secondary, lower-emphasis action next to a primary button.",
+      "html": "<a class=\"ds-btn-ghost\" href=\"#\">REQUEST A DEMO</a>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; justify-content: center; background: #161613; color: #a3a39c; box-shadow: inset 0 0 0 1px #2c2c26; padding: 12px 24px; border-radius: 9999px; font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; }"
+    },
+    {
+      "name": "Chip",
       "kind": "chip",
       "refersTo": "chip",
-      "description": "Pill-shaped example-goal suggestion, display-only.",
+      "description": "Pill-shaped tag/suggestion. Inactive: outline-only. Active: fills with blaze.",
       "html": "<span class=\"ds-chip\">Become a backend engineer</span>",
-      "css": ".ds-chip { display: inline-block; background: #ffffff; color: #5a5140; padding: 6px 12px; border-radius: 9999px; box-shadow: inset 0 0 0 1px #d8c9a8; font-size: 0.8125rem; }"
+      "css": ".ds-chip { display: inline-block; background: #1d1d19; color: #a3a39c; padding: 6px 12px; border-radius: 9999px; box-shadow: inset 0 0 0 1px #2c2c26; font-size: 0.8125rem; }"
     },
     {
       "name": "Waypoint Marker",
       "kind": "custom",
       "refersTo": "waypoint-marker",
-      "description": "Signature component: a numbered, difficulty-graded route marker with a stamped-metal inset.",
+      "description": "Signature component: a numbered, difficulty-graded route marker, now filled from a light-to-black tonal scale instead of three hues.",
       "html": "<span class=\"ds-waypoint ds-waypoint--beginner\">1</span>",
-      "css": ".ds-waypoint { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 9999px; color: #f2e9d6; font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; font-weight: 500; box-shadow: inset 0 2px 3px rgba(0,0,0,0.35), inset 0 -1px 1px rgba(255,255,255,0.15); } .ds-waypoint--beginner { background: #3e5c2c; } .ds-waypoint--intermediate { background: #3e6e82; } .ds-waypoint--advanced { background: #2a241c; }"
+      "css": ".ds-waypoint { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 9999px; font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; font-weight: 500; } .ds-waypoint--beginner { background: #e5e5df; color: #0a0a0a; } .ds-waypoint--intermediate { background: #8a8a80; color: #0a0a0a; } .ds-waypoint--advanced { background: #1a1a16; color: #f5f5f2; box-shadow: inset 0 0 0 1.5px #3d3d35; }"
     },
     {
-      "name": "Signpost Panel",
+      "name": "Card / Panel",
       "kind": "card",
-      "refersTo": "signpost-panel",
-      "description": "The one lifted surface in the system — the hero's goal-input action panel.",
-      "html": "<div class=\"ds-signpost\"><p class=\"ds-signpost__label\">WHERE ARE YOU HEADED?</p></div>",
-      "css": ".ds-signpost { background: #f2e9d6; color: #201b12; padding: 24px; border-radius: 2px; box-shadow: 0 18px 40px -16px rgba(0,0,0,0.55); } .ds-signpost__label { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.14em; color: #5a5140; }"
+      "refersTo": "card",
+      "description": "The one elevation step in the system — a Surface rectangle with a hairline border, 20px radius.",
+      "html": "<div class=\"ds-card\"><p class=\"ds-card__label\">WHERE ARE YOU HEADED?</p></div>",
+      "css": ".ds-card { background: #161613; color: #f5f5f2; padding: 24px; border-radius: 20px; box-shadow: inset 0 0 0 1px #2c2c26; } .ds-card__label { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.14em; color: #a3a39c; }"
     },
     {
       "name": "Chat Bubble",
       "kind": "custom",
       "refersTo": "chat-bubble",
-      "description": "Assistant (left, parchment) and user (right, slate blue) message bubbles.",
+      "description": "Assistant and user message bubbles, both dark now — distinguished by fill step and alignment, not by a light/dark inversion.",
       "html": "<div class=\"ds-bubble ds-bubble--assistant\">Tell me what you're trying to learn.</div>",
-      "css": ".ds-bubble { display: inline-block; max-width: 80%; padding: 10px 14px; border-radius: 2px; font-size: 0.875rem; line-height: 1.5; } .ds-bubble--assistant { background: #f2e9d6; color: #201b12; box-shadow: inset 0 0 0 1px #d8c9a8; } .ds-bubble--user { background: #3e6e82; color: #ede6d6; margin-left: auto; }"
+      "css": ".ds-bubble { display: inline-block; max-width: 80%; padding: 10px 14px; border-radius: 20px; font-size: 1rem; line-height: 1.75; } .ds-bubble--assistant { background: #161613; color: #f5f5f2; box-shadow: inset 0 0 0 1px #2c2c26; } .ds-bubble--user { background: #c85a1f; color: #f5f5f2; margin-left: auto; }"
     },
     {
       "name": "Status Pill",
       "kind": "chip",
       "refersTo": "status-pill",
-      "description": "Multi-state selector (waypoint status). Active pill takes the one blaze accent; inactive pills are outline-only.",
+      "description": "Multi-state selector. Active pill takes the one blaze accent; inactive pills are outline-only.",
       "html": "<div><button class=\"ds-pill\">Not started</button><button class=\"ds-pill ds-pill--active\">In progress</button></div>",
-      "css": ".ds-pill { border-radius: 9999px; padding: 4px 12px; font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.05em; color: #5a5140; box-shadow: inset 0 0 0 1px #d8c9a8; background: transparent; margin-right: 6px; } .ds-pill--active { background: #a94a18; color: #f2e9d6; box-shadow: none; }"
+      "css": ".ds-pill { border-radius: 9999px; padding: 4px 12px; font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.05em; color: #a3a39c; box-shadow: inset 0 0 0 1px #2c2c26; background: transparent; margin-right: 6px; } .ds-pill--active { background: #c85a1f; color: #f5f5f2; box-shadow: none; }"
     }
   ],
   "narrative": {
-    "northStar": "The Trailhead Signpost",
-    "overview": "PathFinder's visual world is a national-park trailhead at dusk: a routed wood sign at the edge of the woods, graded difficulty blazes marking the route ahead, a topographic contour map fading into the tree line. The product's core mechanism — turning a stated goal into a sequenced, prerequisite-aware route — is literally a marked trail, not a course-catalog grid. The category default this world refuses: gradient-hero EdTech SaaS with duotone feature cards and a stock photo of laughing laptop users. The system is quiet and unadorned. It commits to a real material world (routed signage, painted blazes, engraved markers) through restrained, intentional gestures — a lifted signpost panel, a stamped-metal inset on numbered waypoint markers — rather than literal wood-grain texture or skeuomorphic decoration, which would read as costume rather than craft.",
+    "northStar": "The Night Trail",
+    "overview": "PathFinder redesigned as a route marked after dark: a near-black field, a single warm blaze of light cutting through it, everything else rendered in the grayscale of a headlamp beam. Direction was set from a concrete reference the team pointed to (a dark, monochrome, high-craft AI-product site) rather than rolled from a blind concept seed. Product truth, copy, the PathFinder name, and the waypoint/route/trail vocabulary are unchanged — this is a visual-world redesign, not a repositioning.",
     "keyCharacteristics": [
-      "Deep forest-charcoal ground as the dominant field, warm parchment-cream as the carried 'signage' surface",
-      "A single confident rust-orange accent, used only for the primary action and active blaze markers",
-      "Difficulty grading expressed as real trail-blaze colors, reused as a functional system, not decoration",
-      "Zilla Slab display type with carved-sign character, paired with Archivo's wayfinding-grotesk body text",
-      "Flat by default; depth appears only where the world's own materials would have it"
+      "Near-black ground throughout — homepage and app screens alike, no light surface left anywhere",
+      "Exactly one saturated accent, brightened for legibility on near-black, used only for the primary action and active/confirming states",
+      "Difficulty grading as a light-to-black tonal scale instead of three hues",
+      "Zilla Slab pushed to 700 weight for the one hero statement per page; everything else at 600",
+      "A generative line-field hero visual as the one place the system spends real technical ambition"
     ],
     "rules": [
-      { "name": "The One Blaze Rule", "body": "Rust-orange is the only saturated accent on any given screen. It appears exactly where the visitor can act or where a route is actively marked. It never decorates.", "section": "colors" },
-      { "name": "The Graded-Not-Generic Rule", "body": "Difficulty is always shown through the three named blaze colors, never through generic success/warning/danger status colors.", "section": "colors" },
+      { "name": "The One Accent Rule", "body": "Blaze is the only saturated color anywhere in the product. Secondary emphasis is carried by text weight/tone and underline, never a second hue.", "section": "colors" },
+      { "name": "The Graded-Not-Colored Rule", "body": "Difficulty is a light-to-black tonal scale, never separate hues and never generic status colors.", "section": "colors" },
       { "name": "The No-Eyebrow Rule", "body": "No small label ever sits directly above a heading as a kicker.", "section": "typography" },
-      { "name": "The Two-Shadow Rule", "body": "Only the signpost lift and the stamped disc exist as shadows anywhere in the system.", "section": "elevation" }
+      { "name": "The One-Glow Rule", "body": "Only the blaze glow exists as elevation anywhere in the system; every other surface separates with a hairline border, not a shadow.", "section": "elevation" }
     ],
     "dos": [
-      "Do keep rust-orange to one saturated use per screen.",
-      "Do express difficulty/level through the three named blaze colors everywhere in the product.",
+      "Do keep Blaze to the one saturated accent per screen and per product.",
+      "Do express difficulty through the light-to-black tonal scale everywhere.",
       "Do let headings carry their own weight — no eyebrow/kicker labels.",
-      "Do darken (not brighten) interactive colors on hover.",
+      "Do separate surfaces with a hairline border first; reach for the glow only for the primary action and the stamp motion.",
       "Do reuse the waypoint-marker language for any future sequence, timeline, or progress UI."
     ],
     "donts": [
-      "Don't introduce a second saturated accent color.",
-      "Don't add literal wood-grain, paper-fiber, or metal-brush texture images.",
-      "Don't use generic status colors — the palette's trio means difficulty grade, not status.",
-      "Don't add a card-grid feature-list section — the system's structure is sequence-first."
+      "Don't introduce a second saturated accent for links, secondary actions, or intermediate grading.",
+      "Don't use a black drop shadow on a near-black ground — it disappears; use the glow or a border.",
+      "Don't bring back a light/cream surface anywhere, including inputs or nested chips.",
+      "Don't fabricate integration/partner logos to imply endorsements PathFinder doesn't have."
     ]
   }
 }

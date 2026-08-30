@@ -34,18 +34,21 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         {/*
           THESIS: A generated path is a marked trail, not a course list — the
           category default (feature-card SaaS grid) is refused.
-          OWN-WORLD: Deep forest-charcoal ground, warm parchment-cream signage
-          cards, rust-blaze orange accent, waypoint-blue secondary; Zilla Slab
-          display (carved-sign character), Archivo body (wayfinding grotesk),
-          JetBrains Mono for waypoint/coordinate labels.
+          OWN-WORLD: Night Trail — near-black ground everywhere (no light
+          "signage" surface left), one blaze-orange accent (fill-only, plus a
+          brighter glow variant for shadows/bare-text), difficulty graded as
+          a light-to-black tonal scale rather than three hues; Zilla Slab
+          display pushed to 700 for the one hero statement per page, Archivo
+          body, JetBrains Mono for labels. Direction set from a concrete
+          reference site rather than a rolled concept seed.
           STORY: A learner names a goal, sees it become a graded, sequenced
           route with real courses and milestones, and can ask why each stop
           was chosen.
-          FIRST VIEWPORT: Full-bleed topographic-contour dark ground; wordmark
-          in the header, headline and dek on the dark ground at left, a cream
-          signpost panel at right holding the goal input, example chips, and
-          rust CTA that reads as a trail blaze.
-          FORM: Trailhead Signage, grounded direction #3, seed key e907ef5a.
+          FIRST VIEWPORT: Full-bleed near-black hero with a corner tick-mark
+          frame and a generative line field behind the headline; wordmark and
+          pill nav in the header, a dark elevated goal-input card at right.
+          FORM: The Night Trail (redesign from reference), replacing Trailhead
+          Signage.
           FINISH: unreviewed and undocumented is unfinished; this build ends
           with the finish review, the verdict, and DESIGN.md.
         */}

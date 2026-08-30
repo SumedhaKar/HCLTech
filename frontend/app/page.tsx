@@ -1,19 +1,27 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
+import LineField from "./LineField";
 import RouteWaypoint from "./RouteWaypoint";
+import SiteHeader from "./components/SiteHeader";
 
 type Grade = "beginner" | "intermediate" | "advanced";
 
 const GRADE_LABEL: Record<Grade, string> = {
-  beginner: "Green blaze",
-  intermediate: "Blue blaze",
-  advanced: "Black blaze",
+  beginner: "Light trail",
+  intermediate: "Mid trail",
+  advanced: "Dark trail",
 };
 
 const GRADE_CLASS: Record<Grade, string> = {
   beginner: "bg-grade-beginner",
   intermediate: "bg-grade-intermediate",
   advanced: "bg-grade-advanced",
+};
+
+const GRADE_TEXT_CLASS: Record<Grade, string> = {
+  beginner: "text-ground",
+  intermediate: "text-ground",
+  advanced: "text-text",
 };
 
 const EXAMPLE_GOALS = [
@@ -68,7 +76,7 @@ const EXAMPLE_ROUTE: Waypoint[] = [
     order: 5,
     course: "OWASP Top 10 for Web Developers",
     domain: "Cybersecurity",
-    grade: "intermediate",
+    grade: "advanced",
     milestone: "Harden the API",
     note: "Aimed at people who already build web apps — which, by waypoint 5, you do.",
   },
@@ -76,49 +84,56 @@ const EXAMPLE_ROUTE: Waypoint[] = [
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 bg-ground text-text">
-      <header className="flex items-center justify-between px-6 py-5 sm:px-10">
-        <span className="font-serif text-lg tracking-tight text-text [text-shadow:0_1px_0_rgba(0,0,0,0.5)]">
-          PathFinder
-        </span>
-        <Link
-          href="/catalog"
-          className="text-sm text-text-muted underline decoration-ground-line underline-offset-4 transition-colors hover:text-text hover:decoration-blaze"
-        >
-          Browse the catalog
-        </Link>
-      </header>
+    <div className="corner-frame flex flex-col flex-1 bg-ground text-text">
+      <SiteHeader />
 
       {/* First viewport: the thesis, not a header */}
-      <section className="relative overflow-hidden px-6 pb-20 pt-6 sm:px-10 sm:pt-10">
-        <ContourField />
+      <section className="relative overflow-hidden px-6 pb-24 pt-14 sm:px-10 sm:pt-20">
+        <LineField />
 
-        <div className="relative mx-auto grid max-w-5xl gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-          <div>
-            <h1 className="max-w-2xl font-serif text-4xl font-bold leading-[1.05] text-text [text-shadow:0_1px_0_rgba(0,0,0,0.4)] sm:text-6xl">
-              Say where you want to go.
-              <br />
+        <div className="relative mx-auto flex max-w-3xl flex-col items-center gap-8 text-center">
+          <h1 className="max-w-2xl font-serif text-5xl font-bold leading-[1.05] tracking-tight text-text sm:text-7xl">
+            Say where you want to go.
+            <br />
+            <span className="bg-gradient-to-b from-text-muted to-text-faint bg-clip-text text-transparent">
               We&apos;ll mark the trail.
-            </h1>
-            <p className="mt-5 max-w-md text-base leading-7 text-text-muted">
-              PathFinder turns a goal into a graded, sequenced route —
-              real courses, in the right order, with prerequisites marked
-              and every waypoint explained. Not another course list.
-            </p>
+            </span>
+          </h1>
+          <p className="max-w-lg text-base leading-7 text-text-muted">
+            PathFinder turns a goal into a graded, sequenced route —
+            real courses, in the right order, with prerequisites marked
+            and every waypoint explained. Not another course list.
+          </p>
+
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href="/chat"
+              className="inline-flex items-center justify-center gap-1.5 rounded-full bg-blaze px-6 py-3 font-mono text-sm uppercase tracking-wide text-text transition-[background-color,box-shadow] hover:bg-blaze-deep hover:shadow-[0_0_0_1px_rgba(224,136,56,0.4),0_10px_28px_-8px_rgba(224,136,56,0.5)]"
+            >
+              Find my path »
+            </Link>
+            <Link
+              href="/catalog"
+              className="inline-flex items-center justify-center rounded-full bg-surface px-6 py-3 font-mono text-sm uppercase tracking-wide text-text-muted ring-1 ring-border transition-colors hover:text-text hover:ring-border-strong"
+            >
+              Browse the catalog
+            </Link>
           </div>
 
           <GoalPanel />
         </div>
       </section>
 
+      <div className="hatch-divider" aria-hidden />
+
       {/* The mechanism, demonstrated with real catalog content */}
-      <section className="bg-signage px-6 py-20 text-ink sm:px-10">
+      <section className="bg-ground px-6 py-20 sm:px-10">
         <div className="mx-auto max-w-3xl">
-          <h2 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">
+          <h2 className="font-serif text-2xl font-semibold text-text sm:text-3xl">
             Five real waypoints toward &ldquo;Become a backend
             engineer.&rdquo;
           </h2>
-          <p className="mt-3 max-w-xl text-sm leading-6 text-ink-muted">
+          <p className="mt-3 max-w-xl text-sm leading-6 text-text-muted">
             An example route, built from the live catalog — the sequence
             and grading are illustrative of how a generated path reads.
             Your own route depends on your stated goal, experience, and
@@ -132,29 +147,29 @@ export default function Home() {
                   <span
                     aria-hidden
                     style={{ "--i": i } as CSSProperties}
-                    className="trail-line absolute left-[27px] top-14 h-[calc(100%-1.5rem)] w-px border-l-2 border-dashed border-signage-line"
+                    className="trail-line absolute left-[27px] top-14 h-[calc(100%-1.5rem)] w-px border-l-2 border-dashed border-border"
                   />
                 )}
                 <span
-                  className={`absolute left-0 top-0 flex h-14 w-14 items-center justify-center rounded-full font-mono text-lg font-semibold text-signage shadow-[inset_0_2px_3px_rgba(0,0,0,0.35),inset_0_-1px_1px_rgba(255,255,255,0.15)] ${GRADE_CLASS[wp.grade]}`}
+                  className={`absolute left-0 top-0 flex h-14 w-14 items-center justify-center rounded-full font-mono text-lg font-semibold ${GRADE_CLASS[wp.grade]} ${GRADE_TEXT_CLASS[wp.grade]} ${wp.grade === "advanced" ? "ring-1 ring-border-strong" : ""}`}
                 >
                   {wp.order}
                 </span>
 
                 <div className="pb-14">
                   <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                    <h3 className="font-serif text-xl font-bold text-ink">
+                    <h3 className="font-serif text-xl font-bold text-text">
                       {wp.course}
                     </h3>
-                    <span className="font-mono text-[11px] uppercase tracking-wide text-ink-muted">
+                    <span className="font-mono text-[11px] uppercase tracking-wide text-text-faint">
                       {wp.domain}
                     </span>
                   </div>
                   <div className="mt-2 flex flex-wrap items-center gap-3">
-                    <span className="rounded-sm bg-signage-raised px-2 py-1 font-mono text-[11px] uppercase tracking-wide text-ink-muted ring-1 ring-signage-line">
+                    <span className="rounded-full bg-surface-raised px-2.5 py-1 font-mono text-[11px] uppercase tracking-wide text-text-muted ring-1 ring-border">
                       Milestone: {wp.milestone}
                     </span>
-                    <span className="flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wide text-ink-muted">
+                    <span className="flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wide text-text-faint">
                       <span
                         className={`inline-block h-2 w-2 rounded-full ${GRADE_CLASS[wp.grade]}`}
                         aria-hidden
@@ -172,7 +187,7 @@ export default function Home() {
       </section>
 
       {/* Closing CTA */}
-      <section className="border-t border-ground-line bg-ground-raised px-6 py-16 text-center sm:px-10">
+      <section className="border-t border-border bg-ground-raised px-6 py-16 text-center sm:px-10">
         <h2 className="font-serif text-2xl font-semibold text-text sm:text-3xl">
           Your trail starts with one sentence.
         </h2>
@@ -182,15 +197,15 @@ export default function Home() {
         </p>
         <Link
           href="/chat"
-          className="mt-7 inline-flex items-center justify-center rounded-sm bg-blaze px-6 py-3 font-mono text-sm uppercase tracking-wide text-signage transition-colors hover:bg-blaze-deep"
+          className="mt-7 inline-flex items-center justify-center rounded-full bg-blaze px-6 py-3 font-mono text-sm uppercase tracking-wide text-text transition-[background-color,box-shadow] hover:bg-blaze-deep hover:shadow-[0_0_0_1px_rgba(224,136,56,0.4),0_10px_28px_-8px_rgba(224,136,56,0.5)]"
         >
           Start the conversation
         </Link>
       </section>
 
-      <footer className="border-t border-ground-line px-6 py-8 sm:px-10">
+      <footer className="border-t border-border px-6 py-8 sm:px-10">
         <p className="font-mono text-[11px] uppercase tracking-wide text-text-faint">
-          PathFinder — a personalized learning path recommender
+          PathFinder — a personalized learning path recommender · 49 courses across programming, web development, cybersecurity, data, and mobile
         </p>
       </footer>
     </div>
@@ -199,13 +214,13 @@ export default function Home() {
 
 function GoalPanel() {
   return (
-    <div className="relative rounded-sm bg-signage p-6 text-ink shadow-[0_18px_40px_-16px_rgba(0,0,0,0.55)] transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-[0_26px_54px_-14px_rgba(0,0,0,0.6)] sm:p-8">
-      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink-muted">
+    <div className="relative w-full max-w-md rounded-[20px] bg-surface p-6 text-left text-text ring-1 ring-border sm:p-8">
+      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-text-muted">
         Where are you headed?
       </p>
       <div
         aria-hidden
-        className="mt-3 rounded-sm bg-signage-raised px-3 py-3 text-sm text-ink-muted ring-1 ring-signage-line"
+        className="mt-3 rounded-xl bg-surface-raised px-3 py-3 text-sm text-text-muted ring-1 ring-border"
       >
         e.g. &ldquo;I want to become a backend engineer&rdquo;
       </div>
@@ -214,7 +229,7 @@ function GoalPanel() {
         {EXAMPLE_GOALS.map((goal) => (
           <span
             key={goal}
-            className="rounded-full bg-signage-raised px-3 py-1.5 text-xs text-ink-muted ring-1 ring-signage-line"
+            className="rounded-full bg-surface-raised px-3 py-1.5 text-xs text-text-muted ring-1 ring-border"
           >
             {goal}
           </span>
@@ -223,12 +238,12 @@ function GoalPanel() {
 
       <Link
         href="/chat"
-        className="mt-6 flex w-full items-center justify-center rounded-sm bg-blaze px-5 py-3 font-mono text-sm uppercase tracking-wide text-signage transition-colors hover:bg-blaze-deep"
+        className="mt-6 flex w-full items-center justify-center rounded-full bg-blaze px-5 py-3 font-mono text-sm uppercase tracking-wide text-text transition-[background-color,box-shadow] hover:bg-blaze-deep hover:shadow-[0_0_0_1px_rgba(224,136,56,0.4),0_10px_28px_-8px_rgba(224,136,56,0.5)]"
       >
         Find my path
       </Link>
 
-      <p className="mt-4 text-xs leading-5 text-ink-muted">
+      <p className="mt-4 text-xs leading-5 text-text-faint">
         49 courses across programming, web development, cybersecurity, data,
         and mobile — sequenced by prerequisite, not popularity.
       </p>
@@ -238,32 +253,11 @@ function GoalPanel() {
 
 function ExplainCallout({ note }: { note: string }) {
   return (
-    <div className="mt-4 rounded-sm border border-dashed border-ink-muted/40 bg-signage-raised p-4">
-      <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-waypoint-deep">
+    <div className="mt-4 rounded-xl bg-surface p-4 ring-1 ring-border">
+      <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-text-muted">
         Why this waypoint
       </p>
-      <p className="mt-2 text-sm leading-6 text-ink">{note}</p>
+      <p className="mt-2 text-sm leading-6 text-text">{note}</p>
     </div>
-  );
-}
-
-function ContourField() {
-  return (
-    <svg
-      aria-hidden
-      className="contour-field pointer-events-none absolute inset-0 h-full w-full opacity-[0.16]"
-      preserveAspectRatio="xMaxYMin slice"
-      viewBox="0 0 800 500"
-      fill="none"
-    >
-      {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-        <path
-          key={i}
-          d={`M ${-50 + i * 8} ${520 - i * 55} C ${200 + i * 10} ${450 - i * 60}, ${350 - i * 5} ${300 - i * 40}, ${520 + i * 12} ${260 - i * 45} S ${780 - i * 8} ${180 - i * 30}, ${900} ${120 - i * 25}`}
-          stroke="var(--color-blaze-pale)"
-          strokeWidth="1.5"
-        />
-      ))}
-    </svg>
   );
 }

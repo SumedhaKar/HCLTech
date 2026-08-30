@@ -1,39 +1,37 @@
 @import "tailwindcss";
 
 :root {
-  /* Ground: deep forest-charcoal, the dominant field */
-  --ground: #16211b;
-  --ground-raised: #1e2c24;
-  --ground-line: #2c3c32;
+  /* Ground: near-black, the only page background in the system */
+  --ground: #0a0a0a;
+  --ground-raised: #141412;
 
-  /* Signage: warm parchment-cream, the carried-panel surface */
-  --signage: #f2e9d6;
-  --signage-raised: #ffffff;
-  --signage-line: #d8c9a8;
-  --ink: #201b12;
-  --ink-muted: #5a5140;
+  /* Surface: the two elevation steps for cards, panels, inputs — still dark */
+  --surface: #161613;
+  --surface-raised: #1d1d19;
 
-  /* Text on the dark ground, tinted warm/green — never flat gray */
-  --text: #ede6d6;
-  --text-muted: #a9b0a3;
-  --text-faint: #8a9188;
+  /* Hairline borders do the separation work a light "signage" surface used to */
+  --border: #2c2c26;
+  --border-strong: #3d3d35;
 
-  /* Blaze: rust-orange accent, the trail marker / primary action color.
-     Default is dark enough for cream text at 4.5:1; hover deepens further. */
+  /* Text: off-white through gray, tuned for 4.5:1+ against both ground and surface */
+  --text: #f5f5f2;
+  --text-muted: #a3a39c;
+  --text-faint: #83837a;
+
+  /* Blaze: the one saturated accent in the system. Same fill value as the
+     daylight system (proven to clear 4.5:1 with white text on top) —
+     reserved for fills (buttons, markers) only. blaze-glow is a brighter
+     variant used solely for the glow shadow and for the rare bare-text
+     use (e.g. error copy), where the fill value would fail contrast
+     against near-black on its own. */
   --blaze: #a94a18;
   --blaze-deep: #7e3712;
-  --blaze-pale: #f0b98a;
+  --blaze-glow: #e08838;
 
-  /* Waypoint: secondary accent, intermediate difficulty grade, links */
-  --waypoint: #4f8ba3;
-  --waypoint-deep: #3e6e82;
-
-  /* Difficulty-grade colors, reused from real trail-blaze convention.
-     Darkened from the literal hiking-blaze hues so cream numerals on top
-     clear 4.5:1 contrast. */
-  --grade-beginner: #3e5c2c;
-  --grade-intermediate: var(--waypoint-deep);
-  --grade-advanced: #2a241c;
+  /* Difficulty grading: a light-to-black tonal scale, not three hues */
+  --grade-beginner: #e5e5df;
+  --grade-intermediate: #8a8a80;
+  --grade-advanced: #1a1a16;
 
   --font-display: var(--font-display);
   --font-body: var(--font-body);
@@ -43,20 +41,16 @@
 @theme inline {
   --color-ground: var(--ground);
   --color-ground-raised: var(--ground-raised);
-  --color-ground-line: var(--ground-line);
-  --color-signage: var(--signage);
-  --color-signage-raised: var(--signage-raised);
-  --color-signage-line: var(--signage-line);
-  --color-ink: var(--ink);
-  --color-ink-muted: var(--ink-muted);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-text: var(--text);
   --color-text-muted: var(--text-muted);
   --color-text-faint: var(--text-faint);
   --color-blaze: var(--blaze);
   --color-blaze-deep: var(--blaze-deep);
-  --color-blaze-pale: var(--blaze-pale);
-  --color-waypoint: var(--waypoint);
-  --color-waypoint-deep: var(--waypoint-deep);
+  --color-blaze-glow: var(--blaze-glow);
   --color-grade-beginner: var(--grade-beginner);
   --color-grade-intermediate: var(--grade-intermediate);
   --color-grade-advanced: var(--grade-advanced);
@@ -114,9 +108,9 @@ body {
 }
 
 /* A brief weighted "stamp" confirming a waypoint marker just changed state
-   (a checklist field became known, a path item was marked complete) —
-   literalizing the trail-blaze metaphor as physical feedback rather than an
-   instant color swap. Applied and removed by the component after ~500ms. */
+   — literalizing the trail-blaze metaphor as physical feedback rather than
+   an instant color swap. Uses the system's one blaze glow. Applied and
+   removed by the component after ~500ms. */
 @media (prefers-reduced-motion: no-preference) {
   .stamp {
     animation: stamp 480ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -126,25 +120,20 @@ body {
 @keyframes stamp {
   0% {
     transform: scale(1);
-    box-shadow:
-      inset 0 2px 3px rgba(0, 0, 0, 0.35),
-      inset 0 -1px 1px rgba(255, 255, 255, 0.15);
+    box-shadow: none;
   }
   35% {
     transform: scale(1.22);
     box-shadow:
-      inset 0 2px 4px rgba(0, 0, 0, 0.45),
-      inset 0 -1px 1px rgba(255, 255, 255, 0.2),
-      0 6px 10px -4px rgba(0, 0, 0, 0.4);
+      0 0 0 1px rgba(224,136,56, 0.4),
+      0 8px 20px -6px rgba(224,136,56, 0.55);
   }
   65% {
     transform: scale(0.94);
   }
   100% {
     transform: scale(1);
-    box-shadow:
-      inset 0 2px 3px rgba(0, 0, 0, 0.35),
-      inset 0 -1px 1px rgba(255, 255, 255, 0.15);
+    box-shadow: none;
   }
 }
 
@@ -169,4 +158,68 @@ body {
   to {
     transform: translate3d(-2.5%, -3%, 0);
   }
+}
+
+/* The homepage line-field hero visual breathes very slowly — a subtle
+   scale/opacity drift, not the reference's full rotation, so it reads as
+   ambient atmosphere rather than a competing focal point. Static SVG by
+   default; this is additive motion only. */
+@media (prefers-reduced-motion: no-preference) {
+  .line-field-breathe {
+    transform-origin: center;
+    animation: line-field-breathe 9s ease-in-out infinite;
+  }
+}
+
+@keyframes line-field-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.03);
+    opacity: 1;
+  }
+}
+
+/* A thin corner tick-mark frame near the viewport edges — a quiet
+   instrument/blueprint framing device borrowed from the reference. Fixed,
+   decorative, ignored by assistive tech. */
+.corner-frame::before,
+.corner-frame::after {
+  content: "";
+  position: fixed;
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+  z-index: 40;
+}
+.corner-frame::before {
+  top: 12px;
+  left: 12px;
+  border-top: 1px solid var(--border-strong);
+  border-left: 1px solid var(--border-strong);
+}
+.corner-frame::after {
+  top: 12px;
+  right: 12px;
+  border-top: 1px solid var(--border-strong);
+  border-right: 1px solid var(--border-strong);
+}
+
+/* A repeating 45-degree hairline hatch strip marking a section seam —
+   adapted from the reference's divider between sections. Pure CSS, no
+   image asset. */
+.hatch-divider {
+  height: 32px;
+  background-image: repeating-linear-gradient(
+    45deg,
+    var(--border) 0,
+    var(--border) 1px,
+    transparent 1px,
+    transparent 10px
+  );
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }

@@ -2,32 +2,28 @@
 name: PathFinder
 description: An AI-powered personalized learning path recommender
 colors:
-  ground: "#16211b"
-  ground-raised: "#1e2c24"
-  ground-line: "#2c3c32"
-  signage: "#f2e9d6"
-  signage-raised: "#ffffff"
-  signage-line: "#d8c9a8"
-  ink: "#201b12"
-  ink-muted: "#5a5140"
-  text: "#ede6d6"
-  text-muted: "#a9b0a3"
-  text-faint: "#8a9188"
+  ground: "#0a0a0a"
+  ground-raised: "#141412"
+  surface: "#161613"
+  surface-raised: "#1d1d19"
+  border: "#2c2c26"
+  border-strong: "#3d3d35"
+  text: "#f5f5f2"
+  text-muted: "#a3a39c"
+  text-faint: "#83837a"
   blaze: "#a94a18"
   blaze-deep: "#7e3712"
-  blaze-pale: "#f0b98a"
-  waypoint: "#4f8ba3"
-  waypoint-deep: "#3e6e82"
-  grade-beginner: "#3e5c2c"
-  grade-intermediate: "#3e6e82"
-  grade-advanced: "#2a241c"
+  blaze-glow: "#e08838"
+  grade-beginner: "#e5e5df"
+  grade-intermediate: "#8a8a80"
+  grade-advanced: "#1a1a16"
 typography:
   display:
     fontFamily: "Zilla Slab, Georgia, serif"
     fontSize: "clamp(2.25rem, 5vw, 3rem)"
-    fontWeight: 600
-    lineHeight: 1.1
-    letterSpacing: "normal"
+    fontWeight: 700
+    lineHeight: 1.05
+    letterSpacing: "-0.01em"
   body:
     fontFamily: "Archivo, Helvetica Neue, Arial, sans-serif"
     fontSize: "1rem"
@@ -40,7 +36,8 @@ typography:
     lineHeight: 1.4
     letterSpacing: "0.14em"
 rounded:
-  sm: "2px"
+  sm: "10px"
+  lg: "20px"
   full: "9999px"
 spacing:
   sm: "8px"
@@ -50,16 +47,16 @@ spacing:
 components:
   button-primary:
     backgroundColor: "{colors.blaze}"
-    textColor: "{colors.signage}"
-    rounded: "{rounded.sm}"
+    textColor: "{colors.text}"
+    rounded: "{rounded.full}"
     padding: "12px 24px"
   button-primary-hover:
     backgroundColor: "{colors.blaze-deep}"
-    textColor: "{colors.signage}"
-    rounded: "{rounded.sm}"
+    textColor: "{colors.text}"
+    rounded: "{rounded.full}"
   chip:
-    backgroundColor: "{colors.signage-raised}"
-    textColor: "{colors.ink-muted}"
+    backgroundColor: "{colors.surface-raised}"
+    textColor: "{colors.text-muted}"
     rounded: "{rounded.full}"
     padding: "6px 12px"
 ---
@@ -68,127 +65,109 @@ components:
 
 ## Overview
 
-**Creative North Star: "The Trailhead Signpost"**
+**Creative North Star: "The Night Trail"**
 
-PathFinder's visual world is a national-park trailhead at dusk: a routed wood sign at the edge of the woods, graded difficulty blazes marking the route ahead, a topographic contour map fading into the tree line. The product's core mechanism — turning a stated goal into a sequenced, prerequisite-aware route — is literally a marked trail, not a course-catalog grid. The category default this world refuses: gradient-hero EdTech SaaS with duotone feature cards and a stock photo of laughing laptop users.
+PathFinder redesigned as a route marked after dark: a near-black field, a single warm blaze of light cutting through it, everything else rendered in the grayscale of a headlamp beam. The product's mechanism doesn't change — a stated goal still becomes a sequenced, graded route — but the world it's rendered in is now a precise, technical, high-contrast instrument rather than a warm daylight parkland. Difficulty grading, once three named trail-blaze hues, is now a tonal scale: lighter marks the easier ground, the fill deepens toward black as the route gets harder — literally "the further you go, the darker the trail," which reads as more true to a *night* trail than three colors ever did.
 
-The system is quiet and unadorned. It commits to a real material world (routed signage, painted blazes, engraved markers) through restrained, intentional gestures — a lifted signpost panel, a stamped-metal inset on numbered waypoint markers — rather than literal wood-grain texture or skeuomorphic decoration, which would read as costume rather than craft.
+This direction was set from a concrete reference the team pointed to (a dark, monochrome, high-craft AI-product site) rather than rolled from a blind concept seed — the visual grammar (near-black ground, huge bold gradient-fade display type, fully-rounded pill actions, hairline-bordered cards, a generative line-based hero visual, corner tick-mark framing) is adopted deliberately close to that reference. Product truth, copy, the PathFinder name, and the waypoint/route/trail vocabulary are unchanged — this is a visual-world redesign, not a repositioning.
 
 **Key Characteristics:**
-- Deep forest-charcoal ground as the dominant field, warm parchment-cream as the carried "signage" surface
-- A single confident rust-orange accent, used only for the primary action and active blaze markers
-- Difficulty grading (beginner/intermediate/advanced) expressed as real trail-blaze colors, reused as a functional system, not decoration
-- Zilla Slab display type with carved-sign character, paired with Archivo's wayfinding-grotesk body text
-- Flat by default; depth appears only where the world's own materials would have it (a raised panel, a stamped disc)
+- Near-black ground (`#0a0a0a`) throughout — homepage and app screens alike; there is no light "parchment" surface left anywhere in the system.
+- Exactly one saturated accent, unchanged from the daylight system's fill value plus one brighter glow variant for shadows/bare-text — used only for the primary action, active states, and the stamped-confirmation motion. Everything else is grayscale.
+- Difficulty grading expressed as a light-to-black tonal scale, never a second or third hue.
+- Zilla Slab display type pushed to 700 weight with tight tracking for hero-scale statements; Archivo body copy; JetBrains Mono for labels — same three families as before, used harder.
+- A generative line-based hero visual (adapted from the reference's thread/vortex idea as a 2D animated line field, not a full 3D/WebGL clone) is the one place the system spends real technical ambition.
 
 ## Colors
 
-Earthy and muted, never neon or gradient-driven — colors read as pigment and painted metal, not backlit glass.
+Monochrome by default. Color is rationed to a single accent so that when it appears, it means something.
 
 ### Primary
-- **Burnt Rust Blaze** (`#a94a18`): the single saturated accent. Primary buttons and the active trail-blaze marker only. Darkened from the literal hiking-blaze orange so text on top clears contrast at rest; hover deepens further (`#7e3712`) rather than brightening.
-
-### Secondary
-- **Dusk Slate Blue** (`#3e6e82`): the intermediate-difficulty blaze color and link/secondary-emphasis color (e.g. the "why this waypoint" label).
+- **Blaze** (`#a94a18`): the one saturated accent in the entire system. Same value as the daylight system's fill color — it already cleared 4.5:1 with white/off-white text on top, which is the only way it's ever used (button and marker fills, never bare text on the ground). Hover darkens to Blaze Deep (`#7e3712`) and adds the blaze glow; nothing brightens the fill itself, since a brighter fill would fail that same contrast check.
+- **Blaze Glow** (`#e08838`): a brighter variant reserved for the glow shadow and the rare case of blaze-as-bare-text (e.g. error copy) — the fill value fails 4.5:1 as bare text on near-black on its own, so glow/text uses branch off to this lighter value instead of bending the fill.
 
 ### Neutral
-- **Deep Forest Charcoal** (`#16211b`): the dominant page ground.
-- **Raised Forest Panel** (`#1e2c24`): sections that sit one step above the ground (footer band, closing CTA band).
-- **Trailhead Parchment** (`#f2e9d6`): the "signage" surface — any card or panel meant to read as a physical sign face.
-- **Signage White** (`#ffffff`): the raised surface within a parchment panel (inputs, chips, milestone tags).
-- **Trail Ink** (`#201b12`): body text on parchment/white surfaces.
-- **Warm Trail Cream** (`#ede6d6`): body text on the dark ground. Never pure white — always tinted warm.
-- **Moss Trail Green** (`#3e5c2c`) / **Black Diamond Charcoal** (`#2a241c`): the beginner and advanced difficulty-blaze colors, completing the three-step grading system alongside Dusk Slate Blue.
+- **Ground** (`#0a0a0a`): the page background everywhere — hero, app screens, cards' surrounding field. No page in the product uses a light background anymore.
+- **Ground Raised** (`#141412`): a barely-lighter band used only to mark a full-bleed section change (e.g. a closing CTA band) without introducing a border.
+- **Surface** (`#161613`) / **Surface Raised** (`#1d1d19`): the two elevation steps for cards, panels, and inputs — a card sits on Surface, an input or nested chip inside that card sits on Surface Raised. Both are still dark; there is no surface in this system that inverts to light.
+- **Border** (`#2c2c26`) / **Border Strong** (`#3d3d35`): the hairline rings that do almost all of the separation work in this system, replacing the old system's shadows. Border Strong is reserved for a card in a hovered/focused state.
+- **Text** (`#f5f5f2`) / **Text Muted** (`#a3a39c`) / **Text Faint** (`#83837a`): three steps of off-white-to-gray, all tuned to clear 4.5:1 against both Ground and Surface.
 
 ### Named Rules
-**The One Blaze Rule.** Rust-orange is the only saturated accent on any given screen. It appears exactly where the visitor can act (primary CTA) or where a route is actively marked (a blaze). It never decorates.
+**The One Accent Rule** (replaces the old Two-Blaze/Waypoint split). Blaze is the only saturated color anywhere in the product. There is no second accent for links or secondary emphasis — secondary emphasis is carried by Text vs. Text Muted and by an underline, never by introducing a second hue.
 
-**The Graded-Not-Generic Rule.** Difficulty is always shown through the three named blaze colors (moss / slate-blue / charcoal), never through generic "success/warning/danger" status colors borrowed from dashboard UI conventions.
+**The Graded-Not-Colored Rule** (replaces the old Graded-Not-Generic Rule). Difficulty is shown as a light-to-black tonal scale (Grade Beginner → Grade Intermediate → Grade Advanced), never as separate hues and never as generic green/amber/red status colors.
 
 ## Typography
 
-**Display Font:** Zilla Slab (with Georgia, serif fallback)
-**Body Font:** Archivo (with Helvetica Neue, Arial fallback)
-**Label/Mono Font:** JetBrains Mono
+**Display Font:** Zilla Slab — now used at 700 weight for the single loudest statement on a page (a hero H1), 600 for everything else in the display role.
+**Body Font:** Archivo.
+**Label/Mono Font:** JetBrains Mono.
 
-**Character:** A carved-sign slab paired with a wayfinding grotesk — confident and official-feeling without tipping into corporate or bookish. Mono is reserved for anything that reads as a stamped label or coordinate, never used as a "technical" costume.
+**Character:** the same carved-sign slab and wayfinding grotesk as before, but pushed harder — tighter tracking, heavier weight at the top of the scale, more size contrast between a hero statement and a section heading than the daylight system used.
 
 ### Hierarchy
-- **Display** (600, `clamp(2.25rem, 5vw, 3rem)`, 1.1 line-height): section H2s and card-name H3s. The homepage hero H1 is the one exception, carried at 700 weight rather than 600 — the single loudest statement in the product gets a weight step none of its neighbors use, so the hierarchy reads through weight as well as size.
-- **Body** (400, 1rem, 1.75 line-height): paragraph copy, max measure ~65ch. Conversational and explanatory content the visitor is meant to actually read — chat-intake bubbles, the explainer Q&A thread — is set at this floor, not the smaller label/meta size, even though it sits inside a compact panel.
-- **Label** (500, 0.6875rem, 0.14em tracking, uppercase): domain tags, milestone chips, grade labels, footer line — always mono, always tracked, never a substitute for a real heading.
-
-### Named Rules (headings)
-Every page carries exactly one H1. Heading levels never skip (an H1 is followed by an H2 before any H3 appears on that page) — a path item's or waypoint's title is an H2 when it is the only heading below the page's H1, not an H3 held over from a section heading that doesn't exist on that page.
+- **Display** (600 normally, 700 for the one hero H1 per page, `clamp(2.25rem, 5vw, 3rem)` at 600 and up to `text-6xl`/`text-7xl` at 700 on the homepage hero specifically, 1.05 line-height): section H2s and card-name H3s at 600; the homepage hero H1 at 700.
+- **Body** (400, 1rem, 1.75 line-height): paragraph copy and any content the visitor is meant to read closely (chat bubbles, explainer answers), not just scan.
+- **Label** (500, 0.6875rem, 0.14em tracking, uppercase): domain tags, milestone chips, grade labels, footer line — always mono, always tracked.
 
 ### Named Rules
-**The No-Eyebrow Rule.** No small label ever sits directly above a heading as a kicker. Context that would have lived in an eyebrow belongs in the heading itself or the body copy beneath it.
+**The No-Eyebrow Rule** (unchanged). No small label ever sits directly above a heading as a kicker.
+**Heading hierarchy** (unchanged from the previous pass): one H1 per page, no skipped levels.
 
 ## Layout
 
-Single-column content stacked in full-bleed sections, each section a flat field of one ground color (dark charcoal or parchment), alternating to mark rhythm. Within a section, content centers in a max-width column (`max-w-3xl`–`max-w-5xl`). The hero is the one asymmetric exception: a two-column split (headline left, action panel right) that collapses to a single stacked column below `lg`. Route/waypoint content reads as a vertical timeline with a dashed connector line, numbered markers fixed to the left edge.
+Full-bleed near-black throughout — the old alternating dark-ground/parchment section rhythm is gone, since there is no longer a light surface to alternate with. Rhythm instead comes from Ground vs. Ground Raised bands, and from card density. A thin, low-opacity corner tick-mark frame (four short L-shaped marks near the viewport corners, adapted from the reference) sits fixed at the page edges on the homepage as a quiet technical/instrument framing device. A diagonal-hatch hairline strip (a thin repeating 45° line pattern, adapted from the reference) marks the seam between the homepage's hero and the waypoint-list section, replacing the old hard color-block section break.
 
 ## Elevation & Depth
 
-Flat by default. Depth appears only in two deliberate places: the hero's action panel (Trailhead Parchment) sits on a soft, offset, blurred shadow to read as a physically raised sign; and each numbered waypoint marker carries a small inset shadow suggesting a stamped-metal disc. Nothing else in the system casts a shadow.
+Flat and border-driven, not shadow-driven. A card is a Surface-colored rectangle with a Border ring; the only exception is the primary button and the stamped-marker motion, which get a soft blaze-tinted glow (not a black drop shadow — a glow reads correctly on a near-black ground, a dark shadow disappears into it).
 
 ### Shadow Vocabulary
-- **Signpost lift** (`box-shadow: 0 18px 40px -16px rgba(0,0,0,0.55)`): the hero action panel only.
-- **Stamped disc** (`box-shadow: inset 0 2px 3px rgba(0,0,0,0.35), inset 0 -1px 1px rgba(255,255,255,0.15)`): numbered waypoint markers only.
+- **Blaze glow** (`box-shadow: 0 0 0 1px rgba(224,136,56,0.4), 0 8px 24px -8px rgba(224,136,56,0.45)`): the primary action's hover/focus state, and the stamped-confirmation motion. The one place depth appears in the whole system.
 
 ### Named Rules
-**The Two-Shadow Rule.** Only the signpost lift and the stamped disc exist as shadows anywhere in the system. A third shadow vocabulary is a sign the flat/material balance has drifted.
+**The One-Glow Rule** (replaces the old Two-Shadow Rule). Only the blaze glow exists as elevation anywhere in the system; every other surface separates from its neighbor with a hairline border, not a shadow.
 
 ## Shapes
 
-Small, consistent radii throughout (`rounded-sm`, 2px) on cards, buttons, and tags — just enough to soften without going soft-app-generic. Fully circular (`rounded-full`) only for two things: numbered waypoint markers and pill-shaped example-goal chips. No large-radius "bubbly" cards anywhere.
+Inverted from the previous system: actions are now **fully rounded** (pill buttons, matching the reference), while cards and panels use a generous `20px` radius rather than the old sharp `2px`. Nothing in this system is sharp-cornered anymore — that was a deliberate daylight-signpost device that doesn't belong in a night-trail world.
 
 ## Components
 
 ### Buttons
-- **Shape:** 2px radius (`rounded-sm`), never fully rounded.
-- **Primary:** Burnt Rust Blaze background, Trailhead Parchment text, mono uppercase label, tracked letter-spacing, `12px 24px` padding.
-- **Hover:** deepens to `#7e3712` — darker, never brighter.
-- **Secondary/Ghost:** not yet in use; when needed, follow the parchment-panel treatment (parchment/white background, ink text, hairline ring) rather than an outlined-blaze variant.
+- **Shape:** fully rounded (pill).
+- **Primary:** Blaze background, Text (off-white) label, mono uppercase, tracked, `12px 24px` padding, blaze glow on hover.
+- **Secondary/Ghost:** Surface background, Border ring, Text-muted label — used where the reference uses its white-on-dark "Request a demo" pairing (a second, lower-emphasis action next to the primary one).
 
-### Chips
-- **Style:** Signage White background, ink-muted text, 1px hairline ring in Signage Hairline (`#d8c9a8`), fully rounded (pill).
-- **State:** currently display-only (example-goal suggestions); no selected/unselected variant exists yet.
+### Chips / Pills
+- **Style:** Surface Raised background, Text Muted label, fully rounded, hairline Border ring. Active/selected state fills with Blaze and switches label to Text.
 
-### Cards / Containers
-- **Corner Style:** 2px radius.
-- **Background:** Trailhead Parchment (the hero action panel) or the section's own ground color (waypoint list items sit directly on the parchment section, uncontained).
-- **Shadow Strategy:** see Elevation & Depth — only the hero panel is lifted.
-- **Internal Padding:** generous (`24px`–`32px`) on the one lifted panel; list items use left-padding only, no card chrome.
+### Cards / Panels
+- **Corner Style:** `20px` radius.
+- **Background:** Surface, with a Border hairline ring; Border Strong on hover/focus.
+- **Elevation:** none by default — flat, separated by the border alone.
 
 ### Waypoint Marker (signature component)
-A 40px circle in the active difficulty-blaze color, holding the route-order number in mono, Trailhead Parchment text, with the stamped-disc inset shadow. Connected to the next marker by a 1px dashed vertical line in the section's hairline color. This is the system's signature device — any future "sequence" or "progress" UI should reuse this marker language rather than inventing a new one (e.g. a progress bar or step indicator). Reused directly (28px, same treatment) as the "trail permit" checklist marker on the chat-intake screen, filling from an empty hairline-ring outline to a solid grade-beginner disc with an authored checkmark SVG once a field is known.
+Unchanged in structure — a circle holding the route-order number in mono — but now filled from the tonal grade scale (light gray → mid gray → near-black-with-a-light-ring) instead of three hues, with Text (dark ink on the two lighter grades, off-white on the near-black advanced grade) rather than a fixed light numeral. The homepage's example route runs this marker at full size (56px); the dashboard's working list stays compact (40px) — same split as before, reference-agnostic.
 
-The homepage's example route is the one place this marker runs at full size — 56px, with the route-order number at a heavier weight and the connector line drawing itself in behind each marker as it appears (see The Stamped Confirmation, below) — because it is the flagship demonstration of the product's core mechanism to a first-time visitor. The dashboard's real, working version of the same list stays at the compact 40px scale: it is used repeatedly during real task completion, where density and scanability outrank spectacle. Same device, two deliberately different registers for two different jobs.
+### The Stamped Confirmation (motion, unchanged)
+The physical "stamp" confirming a checklist field or a completed path item is unchanged in timing and character, but its glow is now the system's one Blaze Glow rather than a generic shadow punch.
 
-### Chat Bubbles
-Assistant messages: Trailhead Parchment background, Trail Ink text, hairline ring, left-aligned. User messages: Dusk Slate Blue background, Warm Trail Cream text, right-aligned, no ring (the color alone carries the distinction). Both share the 2px radius; no tails or carets.
-
-### Status Pills
-A row of small fully-rounded pills (not the button radius) for a multi-state choice (waypoint status: not started / in progress / completed). The active pill fills with Burnt Rust Blaze and Trailhead Parchment text; inactive pills are text-only with a hairline ring. Deliberately reuses The One Blaze Rule rather than inventing status-specific colors — blaze means "the state you're in," not "success."
-
-### The Stamped Confirmation (motion)
-A brief weighted "stamp" (scale up, settle back, a punch of shadow) plays on a waypoint marker the instant it confirms something real: a trail-permit checklist field going from unknown to known on the chat-intake screen, or a path item being marked Completed on the dashboard. It replaces an instant, silent color swap with physical feedback that literalizes the trail-blaze metaphor — the marker is being stamped, not just recolored. Pure CSS keyframes (`.stamp` in `globals.css`), ~480ms, respects `prefers-reduced-motion`, and is purely additive: the end state is identical with or without it.
-
-### The Living Contour (homepage only)
-The topographic contour lines behind the homepage hero drift slowly as the visitor scrolls, tied to scroll position via `animation-timeline: scroll()` (`.contour-field`). Degrades to the existing static lines with no motion on browsers without scroll-driven animation support (Firefox) — the fallback is simply the pre-existing design, never a broken or empty state. This is a Persuade-surface-only device; the app pages (chat/dashboard/catalog/profile) stay still, per their Operate discipline.
+### The Line Field (hero visual, new)
+A field of thin, near-white lines converging toward a center point behind the homepage hero copy — the system's adaptation of the reference's generative thread visual, built as server-rendered SVG paths (not canvas/WebGL) so the shape is present in the static markup with no client JS or hydration timing involved, with a slow CSS breathing transform for restrained life. Kept intentionally low-opacity so it reads as atmosphere rather than a competing focal point, and pauses under `prefers-reduced-motion`.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** keep rust-orange to one saturated use per screen (The One Blaze Rule).
-- **Do** express difficulty/level through the three named blaze colors, everywhere in the product, not just this page.
+- **Do** keep Blaze to the one saturated accent anywhere in the product (The One Accent Rule).
+- **Do** express difficulty through the light-to-black tonal scale, everywhere in the product.
 - **Do** let headings carry their own weight — no eyebrow/kicker labels above them.
-- **Do** darken (not brighten) interactive colors on hover, to keep every state at or above 4.5:1 text contrast.
-- **Do** reuse the waypoint-marker language for any future sequence, timeline, or progress UI.
+- **Do** separate surfaces with a hairline border first; reach for the blaze glow only for the primary action and the stamp motion.
+- **Do** keep every card and button fully dark — there is no light surface left in this system to fall back to.
 
 ### Don't:
-- **Don't** introduce a second saturated accent color; secondary emphasis uses Dusk Slate Blue only.
-- **Don't** add literal wood-grain, paper-fiber, or metal-brush texture images — the material world is evoked through shadow and color, never through texture assets.
-- **Don't** use generic status colors (green=success, red=error, in the Bootstrap/Material sense) — the palette's green/blue/charcoal trio means difficulty grade, not status.
-- **Don't** add a card-grid feature-list section (icon + heading + text, repeated) — the system's structure is sequence-first, not a grid of equal-weight cards.
+- **Don't** introduce a second saturated accent color for links, secondary actions, or "intermediate" grading — that was the old Dusk Slate Blue and it's retired.
+- **Don't** use a black drop shadow on a near-black ground — it disappears; use the blaze glow or a border instead.
+- **Don't** bring back a light/cream "signage" surface anywhere, including for inputs or nested chips.
+- **Don't** fabricate integration/partner logos the reference uses to imply endorsements PathFinder doesn't have — the logo strip is adapted as a plain real-course-domain-count line instead.

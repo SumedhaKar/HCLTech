@@ -19,9 +19,9 @@ type Course = {
 };
 
 const GRADE_CLASS: Record<Course["level"], string> = {
-  beginner: "bg-grade-beginner",
-  intermediate: "bg-grade-intermediate",
-  advanced: "bg-grade-advanced",
+  beginner: "bg-grade-beginner text-ground",
+  intermediate: "bg-grade-intermediate text-ground",
+  advanced: "bg-grade-advanced text-text ring-1 ring-border-strong",
 };
 
 const STATUS_LABEL: Record<PathItemStatus, string> = {
@@ -74,34 +74,34 @@ export default function DashboardPage() {
   const completedCount = path?.items.filter((i) => i.status === "completed").length ?? 0;
 
   return (
-    <div className="flex flex-1 flex-col bg-signage text-ink">
+    <div className="flex flex-1 flex-col bg-ground text-text">
       <SiteHeader active="/dashboard" />
 
       <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10 sm:px-10">
         {loading && (
-          <p className="font-mono text-xs uppercase tracking-[0.1em] text-ink-muted">
+          <p className="font-mono text-xs uppercase tracking-[0.1em] text-text-faint">
             Loading your path…
           </p>
         )}
 
         {error && (
-          <p className="rounded-sm bg-blaze-pale/30 px-3 py-2.5 text-sm text-blaze-deep ring-1 ring-blaze-pale">
+          <p className="rounded-xl bg-blaze/10 px-3 py-2.5 text-sm text-blaze-glow ring-1 ring-blaze/30">
             {error}
           </p>
         )}
 
         {!loading && notFound && (
-          <div className="rounded-sm bg-signage-raised p-8 text-center ring-1 ring-signage-line">
-            <h1 className="font-serif text-3xl font-semibold text-ink">
+          <div className="rounded-[20px] bg-surface p-8 text-center ring-1 ring-border">
+            <h1 className="font-serif text-3xl font-semibold text-text">
               No route marked yet
             </h1>
-            <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-ink-muted">
+            <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-text-muted">
               Describe your goal in the chat and PathFinder will lay out a
               sequenced route here.
             </p>
             <Link
               href="/chat"
-              className="mt-5 inline-flex items-center justify-center rounded-sm bg-blaze px-5 py-3 font-mono text-sm uppercase tracking-wide text-signage transition-colors hover:bg-blaze-deep"
+              className="mt-5 inline-flex items-center justify-center rounded-full bg-blaze px-5 py-3 font-mono text-sm uppercase tracking-wide text-text transition-[background-color,box-shadow] hover:bg-blaze-deep hover:shadow-[0_0_0_1px_rgba(224,136,56,0.4),0_10px_28px_-8px_rgba(224,136,56,0.5)]"
             >
               Start the conversation
             </Link>
@@ -111,10 +111,10 @@ export default function DashboardPage() {
         {!loading && path && (
           <>
             <div>
-              <h1 className="font-serif text-3xl font-semibold leading-tight text-ink">
+              <h1 className="font-serif text-3xl font-semibold leading-tight text-text">
                 Route toward &ldquo;{path.goal}&rdquo;
               </h1>
-              <p className="mt-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-ink-muted">
+              <p className="mt-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-text-muted">
                 {completedCount} of {path.items.length} waypoints complete
               </p>
             </div>
@@ -204,12 +204,12 @@ function PathItemRow({
       {!isLast && (
         <span
           aria-hidden
-          className="absolute left-[19px] top-10 h-[calc(100%-1rem)] w-px border-l-2 border-dashed border-signage-line"
+          className="absolute left-[19px] top-10 h-[calc(100%-1rem)] w-px border-l-2 border-dashed border-border"
         />
       )}
       <span
-        className={`absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-full font-mono text-sm font-medium text-signage shadow-[inset_0_2px_3px_rgba(0,0,0,0.35),inset_0_-1px_1px_rgba(255,255,255,0.15)] ${
-          course ? GRADE_CLASS[course.level] : "bg-grade-advanced"
+        className={`absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-full font-mono text-sm font-medium ${
+          course ? GRADE_CLASS[course.level] : "bg-grade-advanced text-text ring-1 ring-border-strong"
         } ${stamped ? "stamp" : ""}`}
       >
         {item.sequenceOrder}
@@ -217,18 +217,18 @@ function PathItemRow({
 
       <div className="pb-10">
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <h2 className="font-serif text-lg font-semibold text-ink">
+          <h2 className="font-serif text-lg font-semibold text-text">
             {course?.title ?? "Course"}
           </h2>
           {course && (
-            <span className="font-mono text-[11px] uppercase tracking-wide text-ink-muted">
+            <span className="font-mono text-[11px] uppercase tracking-wide text-text-faint">
               {course.domain}
             </span>
           )}
         </div>
 
         {item.milestoneLabel && (
-          <span className="mt-2 inline-block rounded-sm bg-signage-raised px-2 py-1 font-mono text-[11px] uppercase tracking-wide text-ink-muted ring-1 ring-signage-line">
+          <span className="mt-2 inline-block rounded-full bg-surface-raised px-2.5 py-1 font-mono text-[11px] uppercase tracking-wide text-text-muted ring-1 ring-border">
             Milestone: {item.milestoneLabel}
           </span>
         )}
@@ -243,8 +243,8 @@ function PathItemRow({
               disabled={updating}
               className={
                 item.status === s
-                  ? "rounded-full bg-blaze px-3 py-1 font-mono text-[11px] uppercase tracking-wide text-signage"
-                  : "rounded-full px-3 py-1 font-mono text-[11px] uppercase tracking-wide text-ink-muted ring-1 ring-signage-line transition-colors hover:bg-signage-raised"
+                  ? "rounded-full bg-blaze px-3 py-1 font-mono text-[11px] uppercase tracking-wide text-text"
+                  : "rounded-full px-3 py-1 font-mono text-[11px] uppercase tracking-wide text-text-muted ring-1 ring-border transition-colors hover:bg-surface-raised"
               }
             >
               {STATUS_LABEL[s]}
@@ -257,7 +257,7 @@ function PathItemRow({
             href={course.sourceUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-3 inline-block text-sm font-medium text-ink underline decoration-signage-line underline-offset-2 hover:decoration-ink"
+            className="mt-3 inline-block text-sm font-medium text-text underline decoration-border underline-offset-2 hover:decoration-text"
           >
             View course
           </a>
@@ -272,23 +272,23 @@ function PathItemRow({
                 ask("Why is this recommended at this point in my path?");
               }
             }}
-            className="text-sm text-waypoint-deep underline decoration-signage-line underline-offset-2 hover:decoration-waypoint-deep"
+            className="text-sm text-text-muted underline decoration-border underline-offset-2 hover:text-text hover:decoration-text"
           >
             {explainOpen ? "Hide explanation" : "Why this waypoint?"}
           </button>
 
           {explainOpen && (
-            <div className="mt-3 rounded-sm border border-dashed border-ink-muted/40 bg-signage-raised p-4">
+            <div className="mt-3 rounded-xl bg-surface p-4 ring-1 ring-border">
               {thread.map((t, i) => (
                 <div key={i} className={i > 0 ? "mt-3" : undefined}>
-                  <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-waypoint-deep">
+                  <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-text-muted">
                     {t.question}
                   </p>
-                  <p className="mt-1.5 text-base leading-7 text-ink">{t.answer}</p>
+                  <p className="mt-1.5 text-base leading-7 text-text">{t.answer}</p>
                 </div>
               ))}
               {asking && (
-                <p className="mt-2 font-mono text-xs uppercase tracking-wide text-ink-muted">
+                <p className="mt-2 font-mono text-xs uppercase tracking-wide text-text-faint">
                   Thinking…
                 </p>
               )}
@@ -304,12 +304,12 @@ function PathItemRow({
                   value={question}
                   onChange={(e) => setQuestion(e.target.value)}
                   placeholder="Ask a follow-up…"
-                  className="flex-1 rounded-sm bg-signage px-3 py-2 text-sm text-ink placeholder:text-ink-muted ring-1 ring-signage-line focus:outline-none focus:ring-2 focus:ring-waypoint-deep"
+                  className="flex-1 rounded-full bg-surface-raised px-3 py-2 text-sm text-text placeholder:text-text-faint ring-1 ring-border focus:outline-none focus:ring-2 focus:ring-blaze"
                 />
                 <button
                   type="submit"
                   disabled={asking || !question.trim()}
-                  className="rounded-sm px-3 py-2 font-mono text-[11px] uppercase tracking-wide text-ink-muted ring-1 ring-signage-line transition-colors hover:bg-signage disabled:cursor-not-allowed disabled:opacity-50"
+                  className="rounded-full px-3 py-2 font-mono text-[11px] uppercase tracking-wide text-text-muted ring-1 ring-border transition-colors hover:bg-surface-raised disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   Ask
                 </button>

@@ -6,10 +6,15 @@ import type { ExperienceLevel, LearnerProfile } from "../lib/learnerProfile";
 
 type Course = { id: string; title: string; domain: string };
 
-const EXPERIENCE_OPTIONS: { value: ExperienceLevel; label: string; className: string }[] = [
-  { value: "beginner", label: "Beginner", className: "bg-grade-beginner" },
-  { value: "intermediate", label: "Intermediate", className: "bg-grade-intermediate" },
-  { value: "advanced", label: "Advanced", className: "bg-grade-advanced" },
+const EXPERIENCE_OPTIONS: {
+  value: ExperienceLevel;
+  label: string;
+  bgClass: string;
+  textClass: string;
+}[] = [
+  { value: "beginner", label: "Beginner", bgClass: "bg-grade-beginner", textClass: "text-ground" },
+  { value: "intermediate", label: "Intermediate", bgClass: "bg-grade-intermediate", textClass: "text-ground" },
+  { value: "advanced", label: "Advanced", bgClass: "bg-grade-advanced", textClass: "text-text" },
 ];
 
 export default function ProfilePage() {
@@ -123,18 +128,18 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="flex flex-1 flex-col bg-signage text-ink">
+    <div className="flex flex-1 flex-col bg-ground text-text">
       <SiteHeader active="/profile" />
 
       <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-6 py-10 sm:px-10">
         {loading && (
-          <p className="font-mono text-xs uppercase tracking-[0.1em] text-ink-muted">
+          <p className="font-mono text-xs uppercase tracking-[0.1em] text-text-faint">
             Loading your profile…
           </p>
         )}
 
         {error && (
-          <p className="rounded-sm bg-blaze-pale/30 px-3 py-2.5 text-sm text-blaze-deep ring-1 ring-blaze-pale">
+          <p className="rounded-xl bg-blaze/10 px-3 py-2.5 text-sm text-blaze-glow ring-1 ring-blaze/30">
             {error}
           </p>
         )}
@@ -142,22 +147,22 @@ export default function ProfilePage() {
         {!loading && profile && (
           <>
             <div>
-              <h1 className="font-serif text-3xl font-semibold leading-tight text-ink">
+              <h1 className="font-serif text-3xl font-semibold leading-tight text-text">
                 Your trail profile
               </h1>
-              <p className="mt-1.5 text-sm leading-6 text-ink-muted">
+              <p className="mt-1.5 text-sm leading-6 text-text-muted">
                 What PathFinder knows about you. Edit anything directly, or
                 keep talking it through in chat instead.
               </p>
             </div>
 
-            <div className="rounded-sm bg-signage-raised p-6 shadow-[0_18px_40px_-16px_rgba(0,0,0,0.55)] ring-1 ring-signage-line">
+            <div className="rounded-[20px] bg-surface p-6 ring-1 ring-border">
               <div className="flex flex-col gap-6">
                 {/* Goal */}
                 <div>
                   <label
                     htmlFor="goal"
-                    className="font-mono text-[11px] uppercase tracking-wide text-ink-muted"
+                    className="font-mono text-[11px] uppercase tracking-wide text-text-muted"
                   >
                     Goal
                   </label>
@@ -167,13 +172,13 @@ export default function ProfilePage() {
                     value={goal}
                     onChange={(e) => setGoal(e.target.value)}
                     placeholder="What are you trying to become?"
-                    className="mt-2 w-full rounded-sm bg-signage px-3 py-2.5 text-sm text-ink placeholder:text-ink-muted ring-1 ring-signage-line focus:outline-none focus:ring-2 focus:ring-waypoint-deep"
+                    className="mt-2 w-full rounded-xl bg-surface-raised px-3 py-2.5 text-sm text-text placeholder:text-text-faint ring-1 ring-border focus:outline-none focus:ring-2 focus:ring-blaze"
                   />
                 </div>
 
                 {/* Experience level */}
                 <div>
-                  <p className="font-mono text-[11px] uppercase tracking-wide text-ink-muted">
+                  <p className="font-mono text-[11px] uppercase tracking-wide text-text-muted">
                     Experience level
                   </p>
                   <div className="mt-2 flex flex-wrap gap-2">
@@ -189,8 +194,8 @@ export default function ProfilePage() {
                         }
                         className={
                           experienceLevel === opt.value
-                            ? `rounded-full ${opt.className} px-4 py-1.5 font-mono text-[11px] uppercase tracking-wide text-signage`
-                            : "rounded-full px-4 py-1.5 font-mono text-[11px] uppercase tracking-wide text-ink-muted ring-1 ring-signage-line transition-colors hover:bg-signage"
+                            ? `rounded-full ${opt.bgClass} ${opt.textClass} px-4 py-1.5 font-mono text-[11px] uppercase tracking-wide`
+                            : "rounded-full px-4 py-1.5 font-mono text-[11px] uppercase tracking-wide text-text-muted ring-1 ring-border transition-colors hover:bg-surface-raised"
                         }
                       >
                         {opt.label}
@@ -203,7 +208,7 @@ export default function ProfilePage() {
                 <div>
                   <label
                     htmlFor="interest-input"
-                    className="font-mono text-[11px] uppercase tracking-wide text-ink-muted"
+                    className="font-mono text-[11px] uppercase tracking-wide text-text-muted"
                   >
                     Interests
                   </label>
@@ -211,14 +216,14 @@ export default function ProfilePage() {
                     {interests.map((interest) => (
                       <span
                         key={interest}
-                        className="inline-flex items-center gap-1.5 rounded-full bg-signage-raised px-3 py-1 text-[13px] text-ink-muted ring-1 ring-signage-line"
+                        className="inline-flex items-center gap-1.5 rounded-full bg-surface-raised px-3 py-1 text-[13px] text-text-muted ring-1 ring-border"
                       >
                         {interest}
                         <button
                           type="button"
                           onClick={() => removeInterest(interest)}
                           aria-label={`Remove ${interest}`}
-                          className="-m-1 p-1 text-ink-muted hover:text-blaze-deep"
+                          className="-m-1 p-1 text-text-muted hover:text-blaze-glow"
                         >
                           ×
                         </button>
@@ -238,13 +243,13 @@ export default function ProfilePage() {
                         }
                       }}
                       placeholder="Add an interest…"
-                      className="flex-1 rounded-sm bg-signage px-3 py-2 text-sm text-ink placeholder:text-ink-muted ring-1 ring-signage-line focus:outline-none focus:ring-2 focus:ring-waypoint-deep"
+                      className="flex-1 rounded-full bg-surface-raised px-4 py-2 text-sm text-text placeholder:text-text-faint ring-1 ring-border focus:outline-none focus:ring-2 focus:ring-blaze"
                     />
                     <button
                       type="button"
                       onClick={addInterest}
                       disabled={!interestInput.trim()}
-                      className="rounded-sm px-3 py-2 font-mono text-[11px] uppercase tracking-wide text-ink-muted ring-1 ring-signage-line transition-colors hover:bg-signage disabled:cursor-not-allowed disabled:opacity-50"
+                      className="rounded-full px-3 py-2 font-mono text-[11px] uppercase tracking-wide text-text-muted ring-1 ring-border transition-colors hover:bg-surface-raised disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       Add
                     </button>
@@ -255,7 +260,7 @@ export default function ProfilePage() {
                 <div>
                   <label
                     htmlFor="time-budget"
-                    className="font-mono text-[11px] uppercase tracking-wide text-ink-muted"
+                    className="font-mono text-[11px] uppercase tracking-wide text-text-muted"
                   >
                     Time budget
                   </label>
@@ -267,9 +272,9 @@ export default function ProfilePage() {
                       value={timeBudget}
                       onChange={(e) => setTimeBudget(e.target.value)}
                       placeholder="0"
-                      className="w-24 rounded-sm bg-signage px-3 py-2 text-sm text-ink placeholder:text-ink-muted ring-1 ring-signage-line focus:outline-none focus:ring-2 focus:ring-waypoint-deep"
+                      className="w-24 rounded-xl bg-surface-raised px-3 py-2 text-sm text-text placeholder:text-text-faint ring-1 ring-border focus:outline-none focus:ring-2 focus:ring-blaze"
                     />
-                    <span className="text-sm text-ink-muted">hours / week</span>
+                    <span className="text-sm text-text-muted">hours / week</span>
                   </div>
                 </div>
 
@@ -277,7 +282,7 @@ export default function ProfilePage() {
                 <div>
                   <label
                     htmlFor="course-search"
-                    className="font-mono text-[11px] uppercase tracking-wide text-ink-muted"
+                    className="font-mono text-[11px] uppercase tracking-wide text-text-muted"
                   >
                     Completed courses
                   </label>
@@ -285,14 +290,14 @@ export default function ProfilePage() {
                     {completedCourseIds.map((id) => (
                       <span
                         key={id}
-                        className="inline-flex items-center gap-1.5 rounded-full bg-signage-raised px-3 py-1 text-[13px] text-ink-muted ring-1 ring-signage-line"
+                        className="inline-flex items-center gap-1.5 rounded-full bg-surface-raised px-3 py-1 text-[13px] text-text-muted ring-1 ring-border"
                       >
                         {courseById[id]?.title ?? id}
                         <button
                           type="button"
                           onClick={() => removeCourse(id)}
                           aria-label={`Remove ${courseById[id]?.title ?? id}`}
-                          className="-m-1 p-1 text-ink-muted hover:text-blaze-deep"
+                          className="-m-1 p-1 text-text-muted hover:text-blaze-glow"
                         >
                           ×
                         </button>
@@ -306,19 +311,19 @@ export default function ProfilePage() {
                       value={courseSearch}
                       onChange={(e) => setCourseSearch(e.target.value)}
                       placeholder="Search courses you've already finished…"
-                      className="w-full rounded-sm bg-signage px-3 py-2 text-sm text-ink placeholder:text-ink-muted ring-1 ring-signage-line focus:outline-none focus:ring-2 focus:ring-waypoint-deep"
+                      className="w-full rounded-full bg-surface-raised px-4 py-2 text-sm text-text placeholder:text-text-faint ring-1 ring-border focus:outline-none focus:ring-2 focus:ring-blaze"
                     />
                     {searchResults.length > 0 && (
-                      <ul className="absolute z-10 mt-1 w-full overflow-hidden rounded-sm bg-signage-raised ring-1 ring-signage-line">
+                      <ul className="absolute z-10 mt-1 w-full overflow-hidden rounded-xl bg-surface-raised ring-1 ring-border">
                         {searchResults.map((c) => (
                           <li key={c.id}>
                             <button
                               type="button"
                               onClick={() => addCourse(c.id)}
-                              className="flex w-full items-center justify-between px-3 py-2 text-left text-sm text-ink hover:bg-signage"
+                              className="flex w-full items-center justify-between px-3 py-2 text-left text-sm text-text hover:bg-surface"
                             >
                               <span>{c.title}</span>
-                              <span className="font-mono text-[11px] uppercase tracking-wide text-ink-muted">
+                              <span className="font-mono text-[11px] uppercase tracking-wide text-text-muted">
                                 {c.domain}
                               </span>
                             </button>
@@ -335,12 +340,12 @@ export default function ProfilePage() {
                   type="button"
                   onClick={save}
                   disabled={saving}
-                  className="rounded-sm bg-blaze px-5 py-2.5 font-mono text-sm uppercase tracking-wide text-signage transition-colors hover:bg-blaze-deep disabled:cursor-not-allowed disabled:opacity-60"
+                  className="rounded-full bg-blaze px-5 py-2.5 font-mono text-sm uppercase tracking-wide text-text transition-[background-color,box-shadow] hover:bg-blaze-deep hover:shadow-[0_0_0_1px_rgba(224,136,56,0.4),0_10px_28px_-8px_rgba(224,136,56,0.5)] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {saving ? "Saving…" : "Save profile"}
                 </button>
                 {justSaved && !saving && (
-                  <span className="text-sm text-ink-muted">Saved.</span>
+                  <span className="text-sm text-text-muted">Saved.</span>
                 )}
               </div>
             </div>

@@ -83,20 +83,20 @@ export default function CatalogPage() {
   const hasActiveFilters = search.trim() !== "" || domain !== "" || level !== "";
 
   return (
-    <div className="flex flex-1 flex-col bg-signage text-ink">
+    <div className="flex flex-1 flex-col bg-ground text-text">
       <SiteHeader active="/catalog" />
 
       <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-6 py-10 sm:px-10">
         <div className="flex flex-col gap-1">
-          <h1 className="font-serif text-3xl font-semibold leading-tight text-ink">
+          <h1 className="font-serif text-3xl font-semibold leading-tight text-text">
             Course catalog
           </h1>
-          <p className="text-sm leading-6 text-ink-muted">
+          <p className="text-sm leading-6 text-text-muted">
             49 real courses, the same set PathFinder draws routes from. Browse
             directly, or{" "}
             <Link
               href="/chat"
-              className="text-waypoint-deep underline decoration-signage-line underline-offset-2 hover:decoration-waypoint-deep"
+              className="text-text underline decoration-border underline-offset-2 hover:decoration-text"
             >
               describe a goal
             </Link>{" "}
@@ -110,12 +110,12 @@ export default function CatalogPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by title or description…"
-            className="w-full flex-1 rounded-sm bg-signage-raised px-3 py-2.5 text-sm text-ink placeholder:text-ink-muted ring-1 ring-signage-line focus:outline-none focus:ring-2 focus:ring-waypoint-deep"
+            className="w-full flex-1 rounded-xl bg-surface px-3 py-2.5 text-sm text-text placeholder:text-text-faint ring-1 ring-border focus:outline-none focus:ring-2 focus:ring-blaze"
           />
           <select
             value={domain}
             onChange={(e) => setDomain(e.target.value)}
-            className="rounded-sm bg-signage-raised px-3 py-2.5 text-sm text-ink ring-1 ring-signage-line focus:outline-none focus:ring-2 focus:ring-waypoint-deep"
+            className="rounded-xl bg-surface px-3 py-2.5 text-sm text-text ring-1 ring-border focus:outline-none focus:ring-2 focus:ring-blaze"
           >
             <option value="">All domains</option>
             {domains.map((d) => (
@@ -127,7 +127,7 @@ export default function CatalogPage() {
           <select
             value={level}
             onChange={(e) => setLevel(e.target.value)}
-            className="rounded-sm bg-signage-raised px-3 py-2.5 text-sm text-ink ring-1 ring-signage-line focus:outline-none focus:ring-2 focus:ring-waypoint-deep"
+            className="rounded-xl bg-surface px-3 py-2.5 text-sm text-text ring-1 ring-border focus:outline-none focus:ring-2 focus:ring-blaze"
           >
             <option value="">All levels</option>
             {LEVELS.map((l) => (
@@ -144,7 +144,7 @@ export default function CatalogPage() {
                 setDomain("");
                 setLevel("");
               }}
-              className="whitespace-nowrap rounded-sm px-3 py-2.5 text-sm text-ink-muted ring-1 ring-signage-line transition-colors hover:bg-signage-raised hover:text-ink"
+              className="whitespace-nowrap rounded-xl px-3 py-2.5 text-sm text-text-muted ring-1 ring-border transition-colors hover:bg-surface hover:text-text"
             >
               Clear filters
             </button>
@@ -152,29 +152,29 @@ export default function CatalogPage() {
         </div>
 
         {error && (
-          <p className="rounded-sm bg-blaze-pale/30 px-3 py-2.5 text-sm text-blaze-deep ring-1 ring-blaze-pale">
+          <p className="rounded-xl bg-blaze/10 px-3 py-2.5 text-sm text-blaze-glow ring-1 ring-blaze/30">
             {error}
           </p>
         )}
 
         {loading ? (
-          <p className="font-mono text-xs uppercase tracking-[0.1em] text-ink-muted">
+          <p className="font-mono text-xs uppercase tracking-[0.1em] text-text-faint">
             Loading courses…
           </p>
         ) : courses.length === 0 ? (
-          <p className="text-sm text-ink-muted">No courses match your filters.</p>
+          <p className="text-sm text-text-muted">No courses match your filters.</p>
         ) : (
           <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {courses.map((course) => (
               <li
                 key={course.id}
-                className="flex flex-col gap-3 rounded-sm bg-signage-raised p-4 ring-1 ring-signage-line"
+                className="flex flex-col gap-3 rounded-xl bg-surface p-4 ring-1 ring-border transition-colors hover:ring-border-strong"
               >
                 <div className="flex items-start justify-between gap-2">
-                  <h2 className="font-serif text-base font-semibold leading-snug text-ink">
+                  <h2 className="font-serif text-base font-semibold leading-snug text-text">
                     {course.title}
                   </h2>
-                  <span className="flex shrink-0 items-center gap-1.5 whitespace-nowrap font-mono text-[11px] uppercase tracking-wide text-ink-muted">
+                  <span className="flex shrink-0 items-center gap-1.5 whitespace-nowrap font-mono text-[11px] uppercase tracking-wide text-text-muted">
                     <span
                       className={`inline-block h-2 w-2 rounded-full ${GRADE_DOT[course.level]}`}
                       aria-hidden
@@ -182,10 +182,10 @@ export default function CatalogPage() {
                     {course.level}
                   </span>
                 </div>
-                <p className="text-sm leading-6 text-ink-muted">
+                <p className="text-sm leading-6 text-text-muted">
                   {course.description}
                 </p>
-                <div className="flex flex-wrap gap-x-4 gap-y-1 font-mono text-[11px] uppercase tracking-wide text-ink-muted">
+                <div className="flex flex-wrap gap-x-4 gap-y-1 font-mono text-[11px] uppercase tracking-wide text-text-faint">
                   <span>{course.domain}</span>
                   <span>{course.durationHours}h</span>
                 </div>
@@ -194,7 +194,7 @@ export default function CatalogPage() {
                     {course.skillsTaught.map((skill) => (
                       <span
                         key={skill}
-                        className="rounded-full bg-signage px-2 py-0.5 text-xs text-waypoint-deep ring-1 ring-signage-line"
+                        className="rounded-full bg-surface-raised px-2 py-0.5 text-xs text-text-muted ring-1 ring-border"
                       >
                         {skill}
                       </span>
@@ -206,7 +206,7 @@ export default function CatalogPage() {
                     href={course.sourceUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-auto text-sm font-medium text-ink underline decoration-signage-line underline-offset-2 hover:decoration-ink"
+                    className="mt-auto text-sm font-medium text-text underline decoration-border underline-offset-2 hover:decoration-text"
                   >
                     View course
                   </a>
