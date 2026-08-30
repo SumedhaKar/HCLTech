@@ -30,7 +30,7 @@
       { "name": "rise-in", "value": "700ms cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "One-time staggered entrance for route waypoints on initial paint. Additive only." },
       { "name": "trail-draw", "value": "500ms cubic-bezier(0.16, 1, 0.3, 1), scaleY 0->1", "purpose": "The dashed connector between homepage waypoints draws in from its marker." },
       { "name": "stamp", "value": "480ms cubic-bezier(0.16, 1, 0.3, 1), scale 1->1.22->0.94->1 with a blaze-glow punch", "purpose": "Physical confirmation feedback when a waypoint marker's state actually changes." },
-      { "name": "line-field", "value": "server-rendered SVG paths, CSS breathing transform (scale 1->1.03, 9s), paused under prefers-reduced-motion", "purpose": "Homepage hero generative line field — the adapted version of the reference's thread/vortex visual. SVG rather than canvas so the shape is in the static markup with no client JS." }
+      { "name": "landing-hero-appear", "value": "staggered .appear entrances (scale/soft/mask/pop/btn/side/stat variants), 1.05s cubic-bezier(0.16,1,0.3,1), delays 0.08s-1.44s, resting opacity 1, backstopped by a JS fallback that force-reveals if the animation never runs", "purpose": "One-time entrance choreography for the homepage-only landing hero (badge, headline, lede, CTAs, stats). Replaced the old canvas/SVG line-field hero entirely; scoped to '/' via page.module.css, never globals.css." }
     ],
     "breakpoints": [
       { "name": "sm", "value": "640px" },
@@ -109,7 +109,8 @@
       { "name": "The One Accent Rule", "body": "Blaze is the only saturated color anywhere in the product. Secondary emphasis is carried by text weight/tone and underline, never a second hue.", "section": "colors" },
       { "name": "The Graded-Not-Colored Rule", "body": "Difficulty is a light-to-black tonal scale, never separate hues and never generic status colors.", "section": "colors" },
       { "name": "The No-Eyebrow Rule", "body": "No small label ever sits directly above a heading as a kicker.", "section": "typography" },
-      { "name": "The One-Glow Rule", "body": "Only the blaze glow exists as elevation anywhere in the system; every other surface separates with a hairline border, not a shadow.", "section": "elevation" }
+      { "name": "The One-Glow Rule", "body": "Only the blaze glow exists as elevation anywhere in the system; every other surface separates with a hairline border, not a shadow.", "section": "elevation" },
+      { "name": "The One-Surface Exception", "body": "The homepage ('/') carries its own pure-black, liquid-metal landing-hero system (Inter/Instrument Serif, glass buttons, single viewport) built from a second concrete reference. It is the only page allowed to deviate from Night Trail's tokens; catalog/chat/dashboard/profile stay on Night Trail.", "section": "layout" }
     ],
     "dos": [
       "Do keep Blaze to the one saturated accent per screen and per product.",
@@ -122,7 +123,8 @@
       "Don't introduce a second saturated accent for links, secondary actions, or intermediate grading.",
       "Don't use a black drop shadow on a near-black ground — it disappears; use the glow or a border.",
       "Don't bring back a light/cream surface anywhere, including inputs or nested chips.",
-      "Don't fabricate integration/partner logos to imply endorsements PathFinder doesn't have."
+      "Don't fabricate integration/partner logos to imply endorsements PathFinder doesn't have.",
+      "Don't extend the landing hero's black/liquid-metal system past '/', and don't put invented adoption/traction stats in its footer — every stat there must be a true product fact."
     ]
   }
 }

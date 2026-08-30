@@ -1,263 +1,189 @@
-import Link from "next/link";
-import type { CSSProperties } from "react";
-import LineField from "./LineField";
-import RouteWaypoint from "./RouteWaypoint";
-import SiteHeader from "./components/SiteHeader";
+import styles from "./page.module.css";
+import HeaderNav from "./HeaderNav";
+import AppearFallback from "./AppearFallback";
 
-type Grade = "beginner" | "intermediate" | "advanced";
+const HERO_VIDEO_SRC = "/hero-video.mp4";
 
-const GRADE_LABEL: Record<Grade, string> = {
-  beginner: "Light trail",
-  intermediate: "Mid trail",
-  advanced: "Dark trail",
-};
-
-const GRADE_CLASS: Record<Grade, string> = {
-  beginner: "bg-grade-beginner",
-  intermediate: "bg-grade-intermediate",
-  advanced: "bg-grade-advanced",
-};
-
-const GRADE_TEXT_CLASS: Record<Grade, string> = {
-  beginner: "text-ground",
-  intermediate: "text-ground",
-  advanced: "text-text",
-};
-
-const EXAMPLE_GOALS = [
-  "Become a backend engineer",
-  "Break into cybersecurity",
-  "Learn data engineering",
-];
-
-type Waypoint = {
-  order: number;
-  course: string;
-  domain: string;
-  grade: Grade;
-  milestone: string;
-  note: string;
-};
-
-const EXAMPLE_ROUTE: Waypoint[] = [
+const STATS = [
   {
-    order: 1,
-    course: "Python for Everybody",
-    domain: "Programming Fundamentals",
-    grade: "beginner",
-    milestone: "Foundations",
-    note: "Every later waypoint assumes you can read and write basic Python.",
+    label: "103 real courses across 17 domains",
+    icon: (
+      <svg className={styles.statIcon} viewBox="0 0 24 24" aria-hidden>
+        <defs>
+          <linearGradient id="stat1a" x1="3" y1="2" x2="14" y2="22">
+            <stop offset="0" stopColor="#ffffff" stopOpacity="0.38" />
+            <stop offset="1" stopColor="#3a3a3a" stopOpacity="0.62" />
+          </linearGradient>
+          <linearGradient id="stat1b" x1="3" y1="2" x2="14" y2="22">
+            <stop offset="0" stopColor="#3a3a3a" stopOpacity="0.38" />
+            <stop offset="1" stopColor="#ffffff" stopOpacity="0.62" />
+          </linearGradient>
+        </defs>
+        <rect x="3.4" y="2.6" width="7.2" height="18.8" rx="3.6" fill="url(#stat1a)" />
+        <rect x="13.4" y="2.6" width="7.2" height="18.8" rx="3.6" fill="url(#stat1b)" />
+        <rect x="9.2" y="10.9" width="5.6" height="2.2" rx="1.1" fill="#4a4a4a" />
+      </svg>
+    ),
   },
   {
-    order: 2,
-    course: "Git and GitHub for Beginners",
-    domain: "Programming Fundamentals",
-    grade: "beginner",
-    milestone: "Foundations",
-    note: "The version-control habit every team, and every later course, quietly assumes.",
+    label: "3 difficulty grades, auto-sequenced by prerequisite",
+    icon: (
+      <svg className={styles.statIcon} viewBox="0 0 24 24" aria-hidden>
+        <rect x="2.4" y="2.4" width="19.2" height="19.2" rx="6.2" fill="#ffffff" />
+        <path
+          d="M12 7.1v7.4M8.15 12.35L12 16.2l3.85-3.85"
+          fill="none"
+          stroke="#111"
+          strokeWidth="1.85"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    ),
   },
   {
-    order: 3,
-    course: "Introduction to SQL",
-    domain: "Programming Fundamentals",
-    grade: "beginner",
-    milestone: "Foundations",
-    note: "A backend without a database story isn't a backend. This is the baseline.",
-  },
-  {
-    order: 4,
-    course: "Node.js, Express, MongoDB & More",
-    domain: "Web Development",
-    grade: "intermediate",
-    milestone: "Build the API",
-    note: "Routing, middleware, and a real document database — the actual job.",
-  },
-  {
-    order: 5,
-    course: "OWASP Top 10 for Web Developers",
-    domain: "Cybersecurity",
-    grade: "advanced",
-    milestone: "Harden the API",
-    note: "Aimed at people who already build web apps — which, by waypoint 5, you do.",
+    label: "100% personalized — never a generic list",
+    icon: (
+      <svg className={styles.statIconWide} viewBox="0 0 40 22" aria-hidden>
+        <circle cx="10.2" cy="11" r="9.2" fill="#2b2b2b" />
+        <ellipse cx="10.2" cy="12.1" rx="4.15" ry="3.7" fill="#f4f4f4" />
+        <circle cx="8.6" cy="11.6" r="0.7" fill="#1a1a1a" />
+        <circle cx="11.8" cy="11.6" r="0.7" fill="#1a1a1a" />
+
+        <circle cx="20.2" cy="11" r="9.2" fill="#ffffff" />
+        <circle cx="18.4" cy="10.2" r="1.7" fill="#111111" />
+        <circle cx="22" cy="10.2" r="1.7" fill="#111111" />
+        <ellipse cx="20.2" cy="12.9" rx="1.1" ry="0.8" fill="#111111" />
+        <path
+          d="M17.3 14.7c1 1.3 4.6 1.3 5.6 0"
+          fill="none"
+          stroke="#111"
+          strokeWidth="1.2"
+          strokeLinecap="round"
+        />
+
+        <circle cx="30.2" cy="11" r="9.2" fill="#f26b1d" />
+        <text
+          x="30.2"
+          y="15.1"
+          fontSize="12.5"
+          fontWeight="700"
+          fontFamily="Inter, system-ui, sans-serif"
+          fill="#ffffff"
+          textAnchor="middle"
+        >
+          e
+        </text>
+      </svg>
+    ),
   },
 ];
 
 export default function Home() {
   return (
-    <div className="corner-frame flex flex-col flex-1 bg-ground text-text">
-      <SiteHeader />
+    <>
+      {/* eslint-disable-next-line @next/next/no-page-custom-font -- exact
+          self-hosted-font fallback specified for the landing hero only;
+          rest of the app uses next/font (Zilla Slab/Archivo/JetBrains Mono). */}
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900&family=Instrument+Serif:ital@1&display=swap"
+      />
 
-      {/* First viewport: the thesis, not a header */}
-      <section className="relative overflow-hidden px-6 pb-24 pt-14 sm:px-10 sm:pt-20">
-        <LineField />
-
-        <div className="relative mx-auto flex max-w-3xl flex-col items-center gap-8 text-center">
-          <h1 className="max-w-2xl font-serif text-5xl font-bold leading-[1.05] tracking-tight text-text sm:text-7xl">
-            Say where you want to go.
-            <br />
-            <span className="bg-gradient-to-b from-text-muted to-text-faint bg-clip-text text-transparent">
-              We&apos;ll mark the trail.
-            </span>
-          </h1>
-          <p className="max-w-lg text-base leading-7 text-text-muted">
-            PathFinder turns a goal into a graded, sequenced route —
-            real courses, in the right order, with prerequisites marked
-            and every waypoint explained. Not another course list.
-          </p>
-
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <Link
-              href="/chat"
-              className="inline-flex items-center justify-center gap-1.5 rounded-full bg-blaze px-6 py-3 font-mono text-sm uppercase tracking-wide text-text transition-[background-color,box-shadow] hover:bg-blaze-deep hover:shadow-[0_0_0_1px_rgba(224,136,56,0.4),0_10px_28px_-8px_rgba(224,136,56,0.5)]"
-            >
-              Find my path »
-            </Link>
-            <Link
-              href="/catalog"
-              className="inline-flex items-center justify-center rounded-full bg-surface px-6 py-3 font-mono text-sm uppercase tracking-wide text-text-muted ring-1 ring-border transition-colors hover:text-text hover:ring-border-strong"
-            >
-              Browse the catalog
-            </Link>
-          </div>
-
-          <GoalPanel />
-        </div>
-      </section>
-
-      <div className="hatch-divider" aria-hidden />
-
-      {/* The mechanism, demonstrated with real catalog content */}
-      <section className="bg-ground px-6 py-20 sm:px-10">
-        <div className="mx-auto max-w-3xl">
-          <h2 className="font-serif text-2xl font-semibold text-text sm:text-3xl">
-            Five real waypoints toward &ldquo;Become a backend
-            engineer.&rdquo;
-          </h2>
-          <p className="mt-3 max-w-xl text-sm leading-6 text-text-muted">
-            An example route, built from the live catalog — the sequence
-            and grading are illustrative of how a generated path reads.
-            Your own route depends on your stated goal, experience, and
-            time.
-          </p>
-
-          <ol className="mt-12 flex flex-col">
-            {EXAMPLE_ROUTE.map((wp, i) => (
-              <RouteWaypoint key={wp.order} index={i}>
-                {i < EXAMPLE_ROUTE.length - 1 && (
-                  <span
-                    aria-hidden
-                    style={{ "--i": i } as CSSProperties}
-                    className="trail-line absolute left-[27px] top-14 h-[calc(100%-1.5rem)] w-px border-l-2 border-dashed border-border"
-                  />
-                )}
-                <span
-                  className={`absolute left-0 top-0 flex h-14 w-14 items-center justify-center rounded-full font-mono text-lg font-semibold ${GRADE_CLASS[wp.grade]} ${GRADE_TEXT_CLASS[wp.grade]} ${wp.grade === "advanced" ? "ring-1 ring-border-strong" : ""}`}
-                >
-                  {wp.order}
-                </span>
-
-                <div className="pb-14">
-                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                    <h3 className="font-serif text-xl font-bold text-text">
-                      {wp.course}
-                    </h3>
-                    <span className="font-mono text-[11px] uppercase tracking-wide text-text-faint">
-                      {wp.domain}
-                    </span>
-                  </div>
-                  <div className="mt-2 flex flex-wrap items-center gap-3">
-                    <span className="rounded-full bg-surface-raised px-2.5 py-1 font-mono text-[11px] uppercase tracking-wide text-text-muted ring-1 ring-border">
-                      Milestone: {wp.milestone}
-                    </span>
-                    <span className="flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wide text-text-faint">
-                      <span
-                        className={`inline-block h-2 w-2 rounded-full ${GRADE_CLASS[wp.grade]}`}
-                        aria-hidden
-                      />
-                      {GRADE_LABEL[wp.grade]}
-                    </span>
-                  </div>
-
-                  {wp.order === 4 && <ExplainCallout note={wp.note} />}
-                </div>
-              </RouteWaypoint>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      {/* Closing CTA */}
-      <section className="border-t border-border bg-ground-raised px-6 py-16 text-center sm:px-10">
-        <h2 className="font-serif text-2xl font-semibold text-text sm:text-3xl">
-          Your trail starts with one sentence.
-        </h2>
-        <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-text-muted">
-          No account needed to see how it works — describe a goal and get a
-          route back.
-        </p>
-        <Link
-          href="/chat"
-          className="mt-7 inline-flex items-center justify-center rounded-full bg-blaze px-6 py-3 font-mono text-sm uppercase tracking-wide text-text transition-[background-color,box-shadow] hover:bg-blaze-deep hover:shadow-[0_0_0_1px_rgba(224,136,56,0.4),0_10px_28px_-8px_rgba(224,136,56,0.5)]"
-        >
-          Start the conversation
-        </Link>
-      </section>
-
-      <footer className="border-t border-border px-6 py-8 sm:px-10">
-        <p className="font-mono text-[11px] uppercase tracking-wide text-text-faint">
-          PathFinder — a personalized learning path recommender · 49 courses across programming, web development, cybersecurity, data, and mobile
-        </p>
-      </footer>
-    </div>
-  );
-}
-
-function GoalPanel() {
-  return (
-    <div className="relative w-full max-w-md rounded-[20px] bg-surface p-6 text-left text-text ring-1 ring-border sm:p-8">
-      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-text-muted">
-        Where are you headed?
-      </p>
-      <div
+      <div className={styles.grain} aria-hidden />
+      <video
+        className={styles.heroVideo}
         aria-hidden
-        className="mt-3 rounded-xl bg-surface-raised px-3 py-3 text-sm text-text-muted ring-1 ring-border"
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
       >
-        e.g. &ldquo;I want to become a backend engineer&rdquo;
+        <source src={HERO_VIDEO_SRC} type="video/mp4" />
+      </video>
+
+      <div className={styles.page}>
+        <HeaderNav />
+
+        <main className={styles.hero} id="top">
+          <div className={styles.heroCopy}>
+            <span
+              className={`${styles.badge} appear appear--pop`}
+              style={{ ["--d" as string]: "0.22s" }}
+            >
+              <svg
+                className={`${styles.badgeStar} badge-star`}
+                width="18"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="white"
+                aria-hidden
+              >
+                <path d="M12 2.6C12.55 2.6 12.88 3.15 13.08 4.7c.62 4.7 1.52 5.6 6.22 6.22 1.55.2 2.1.53 2.1 1.08s-.55.88-2.1 1.08c-4.7.62-5.6 1.52-6.22 6.22-.2 1.55-.53 2.1-1.08 2.1s-.88-.55-1.08-2.1c-.62-4.7-1.52-5.6-6.22-6.22C3.15 12.88 2.6 12.55 2.6 12s.55-.88 2.1-1.08c4.7-.62 5.6-1.52 6.22-6.22C11.12 3.15 11.45 2.6 12 2.6Z" />
+              </svg>
+              AI-Sequenced Learning Paths
+            </span>
+
+            <h1 className={styles.h1}>
+              <span
+                className={`${styles.headlineLine} appear appear--mask`}
+                style={{ ["--d" as string]: "0.42s" }}
+              >
+                Chart a{" "}
+                <em className={`${styles.em} em-emphasis`}>guided route</em>{" "}
+                through
+              </span>
+              <span
+                className={`${styles.headlineLine} appear appear--mask`}
+                style={{ ["--d" as string]: "0.62s" }}
+              >
+                real courses, in minutes.
+              </span>
+            </h1>
+
+            <p
+              className={`${styles.lede} appear appear--soft`}
+              style={{ ["--d" as string]: "0.82s", animationDuration: "1.25s" }}
+            >
+              PathFinder sequences real courses into one guided route,
+              matched to your goal, experience, and time.
+            </p>
+
+            <div className={styles.heroActions}>
+              <a
+                href="/chat"
+                className={`${styles.btn} ${styles.btnSolid} ${styles.heroBtn} appear appear--btn`}
+                style={{ ["--d" as string]: "0.96s" }}
+              >
+                Find my path
+              </a>
+              <a
+                href="/catalog"
+                className={`${styles.btn} ${styles.btnGhost} ${styles.heroBtn} appear appear--side`}
+                style={{ ["--d" as string]: "1.10s" }}
+              >
+                Browse the catalog
+              </a>
+            </div>
+          </div>
+        </main>
+
+        <footer className={styles.stats}>
+          {STATS.map((stat, i) => (
+            <span
+              key={stat.label}
+              className={`${styles.stat} appear appear--stat`}
+              style={{ ["--d" as string]: `${1.12 + i * 0.16}s` }}
+            >
+              {stat.icon}
+              {stat.label}
+            </span>
+          ))}
+        </footer>
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-2">
-        {EXAMPLE_GOALS.map((goal) => (
-          <span
-            key={goal}
-            className="rounded-full bg-surface-raised px-3 py-1.5 text-xs text-text-muted ring-1 ring-border"
-          >
-            {goal}
-          </span>
-        ))}
-      </div>
-
-      <Link
-        href="/chat"
-        className="mt-6 flex w-full items-center justify-center rounded-full bg-blaze px-5 py-3 font-mono text-sm uppercase tracking-wide text-text transition-[background-color,box-shadow] hover:bg-blaze-deep hover:shadow-[0_0_0_1px_rgba(224,136,56,0.4),0_10px_28px_-8px_rgba(224,136,56,0.5)]"
-      >
-        Find my path
-      </Link>
-
-      <p className="mt-4 text-xs leading-5 text-text-faint">
-        49 courses across programming, web development, cybersecurity, data,
-        and mobile — sequenced by prerequisite, not popularity.
-      </p>
-    </div>
-  );
-}
-
-function ExplainCallout({ note }: { note: string }) {
-  return (
-    <div className="mt-4 rounded-xl bg-surface p-4 ring-1 ring-border">
-      <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-text-muted">
-        Why this waypoint
-      </p>
-      <p className="mt-2 text-sm leading-6 text-text">{note}</p>
-    </div>
+      <AppearFallback />
+    </>
   );
 }

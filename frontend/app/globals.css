@@ -87,26 +87,6 @@ body {
   }
 }
 
-/* The trail connector between waypoints draws in from its marker rather
-   than appearing all at once — the route being marked, not just revealed.
-   transform-origin: top + scaleY avoids animating layout (height). */
-@media (prefers-reduced-motion: no-preference) {
-  .trail-line {
-    transform-origin: top;
-    animation: trail-draw 500ms cubic-bezier(0.16, 1, 0.3, 1) both;
-    animation-delay: calc(var(--i, 0) * 90ms + 250ms);
-  }
-}
-
-@keyframes trail-draw {
-  from {
-    transform: scaleY(0);
-  }
-  to {
-    transform: scaleY(1);
-  }
-}
-
 /* A brief weighted "stamp" confirming a waypoint marker just changed state
    — literalizing the trail-blaze metaphor as physical feedback rather than
    an instant color swap. Uses the system's one blaze glow. Applied and
@@ -137,89 +117,88 @@ body {
   }
 }
 
-/* Homepage hero: the topographic contour lines drift slowly as the visitor
-   scrolls past, tied to document scroll position — a living map rather than
-   a static backdrop. CSS-only, degrades to the current static lines on
-   browsers without scroll-driven animation support (Firefox). */
-@supports (animation-timeline: scroll()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .contour-field {
-      animation: contour-drift auto ease-in-out;
-      animation-timeline: scroll(root block);
-      animation-range: 0 60vh;
-    }
+/* Landing-hero entrance choreography (homepage only). Plain global classes
+   (not CSS-module-scoped) because AppearFallback.tsx toggles `is-in` via
+   classList string operations after animationend, or forces it immediately
+   if the browser never actually runs the animation. Resting opacity is 1 —
+   content is visible by default even with animations/JS disabled; `both`
+   fill-mode is what actually hides elements during their delay window. */
+.appear {
+  opacity: 1;
+  animation-duration: 1.05s;
+  animation-fill-mode: both;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  animation-delay: var(--d, 0.08s);
+}
+.appear.is-in {
+  animation: none;
+  opacity: 1;
+  transform: none;
+  clip-path: none;
+  filter: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .appear {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+    filter: none !important;
   }
 }
 
-@keyframes contour-drift {
-  from {
-    transform: translate3d(0, 0, 0);
-  }
-  to {
-    transform: translate3d(-2.5%, -3%, 0);
-  }
+.appear--scale { animation-name: v-in-scale; }
+.appear--soft { animation-name: v-in-soft; }
+.appear--mask { animation-name: v-in-mask; }
+.appear--pop { animation-name: v-in-pop; }
+.appear--btn { animation-name: v-in-btn; }
+.appear--side { animation-name: v-in-side; }
+.appear--stat { animation-name: v-in-stat; }
+
+@keyframes v-in-scale {
+  from { opacity: 0; transform: scale(0.84); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes v-in-soft {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes v-in-mask {
+  from { opacity: 0; transform: translateY(40%); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes v-in-pop {
+  0% { opacity: 0; transform: scale(0.9); }
+  70% { opacity: 1; transform: scale(1.03); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes v-in-btn {
+  from { opacity: 0; transform: translateY(18px) scale(0.94); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes v-in-side {
+  from { opacity: 0; transform: translateX(22px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes v-in-stat {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* The homepage line-field hero visual breathes very slowly — a subtle
-   scale/opacity drift, not the reference's full rotation, so it reads as
-   ambient atmosphere rather than a competing focal point. Static SVG by
-   default; this is additive motion only. */
 @media (prefers-reduced-motion: no-preference) {
-  .line-field-breathe {
-    transform-origin: center;
-    animation: line-field-breathe 9s ease-in-out infinite;
+  .badge-star {
+    animation: v-in-star 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.28s both;
+  }
+  .em-emphasis {
+    animation: v-in-em 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.72s both;
   }
 }
-
-@keyframes line-field-breathe {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.9;
-  }
-  50% {
-    transform: scale(1.03);
-    opacity: 1;
-  }
+@keyframes v-in-star {
+  0% { opacity: 0; transform: scale(0.2) rotate(-50deg); }
+  65% { opacity: 1; transform: scale(1.2) rotate(8deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
 }
-
-/* A thin corner tick-mark frame near the viewport edges — a quiet
-   instrument/blueprint framing device borrowed from the reference. Fixed,
-   decorative, ignored by assistive tech. */
-.corner-frame::before,
-.corner-frame::after {
-  content: "";
-  position: fixed;
-  width: 16px;
-  height: 16px;
-  pointer-events: none;
-  z-index: 40;
-}
-.corner-frame::before {
-  top: 12px;
-  left: 12px;
-  border-top: 1px solid var(--border-strong);
-  border-left: 1px solid var(--border-strong);
-}
-.corner-frame::after {
-  top: 12px;
-  right: 12px;
-  border-top: 1px solid var(--border-strong);
-  border-right: 1px solid var(--border-strong);
-}
-
-/* A repeating 45-degree hairline hatch strip marking a section seam —
-   adapted from the reference's divider between sections. Pure CSS, no
-   image asset. */
-.hatch-divider {
-  height: 32px;
-  background-image: repeating-linear-gradient(
-    45deg,
-    var(--border) 0,
-    var(--border) 1px,
-    transparent 1px,
-    transparent 10px
-  );
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+@keyframes v-in-em {
+  from { opacity: 0.35; filter: blur(4px); }
+  to { opacity: 1; filter: blur(0); }
 }
