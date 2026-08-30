@@ -18,7 +18,37 @@ from app.services.gemini_client import GeminiError, get_client
 
 MODEL_NAME = "gemini-3.5-flash-lite"
 
-SYSTEM_INSTRUCTION = """You are the intake assistant for PathFinder, a learning-path \
+# The catalog's actual domain taxonomy (see supabase/seed/0001_courses.sql and
+# 0002_courses_expansion.sql — keep this in sync if a domain is ever added,
+# renamed, or removed there). Given to the model so it can ground a learner's
+# specific, free-text interest ("forensic science", "criminal lawyer") in a
+# domain the recommender's catalog actually has, rather than only extracting
+# the learner's own wording verbatim. The recommender matches interests
+# against course domain and skill tags via substring, so a niche interest
+# with no literal overlap with any tag (e.g. "forensic" against the Law
+# domain's tags) previously matched nothing at all, even when the catalog
+# has clearly relevant courses one level up (general Law foundations).
+CATALOG_DOMAINS = [
+    "Programming Fundamentals",
+    "Web Development",
+    "Data Science & Machine Learning",
+    "Cloud & DevOps",
+    "Cybersecurity",
+    "Mobile Development",
+    "UX & Product Design",
+    "Marketing",
+    "Business & Management",
+    "Finance & Accounting",
+    "Design",
+    "Basic Sciences",
+    "Bio Sciences",
+    "Law",
+    "Mechanical Engineering",
+    "Civil Engineering",
+    "Electrical Engineering",
+]
+
+SYSTEM_INSTRUCTION = f"""You are the intake assistant for PathFinder, a learning-path \
 recommender. Hold a short, friendly conversation with a learner to figure out enough \
 about them to build a personalized course path, then extract what you've learned into \
 structured fields on every turn.
@@ -31,6 +61,8 @@ The fields you are extracting (a partial learner profile):
 completed (leave empty unless they name specific ids).
 - timeBudgetHoursPerWeek: an integer number of hours per week the learner can study.
 
+The course catalog is organized into these domains only: {", ".join(CATALOG_DOMAINS)}.
+
 Rules:
 1. profilePatch must always include every field listed above, on every turn, with no \
 exceptions. If the conversation doesn't yet support a value for a field, set it to null \
@@ -42,6 +74,12 @@ clarifying question about it in "reply" — one question at a time, don't interr
 at least one interest. Otherwise set it to false.
 4. "reply" is always a natural, conversational response to the learner's latest message. \
 Never mention that you are extracting structured data or reference field names.
+5. In "interests", always include the learner's own specific words (e.g. "forensic \
+science"), AND ALSO add the single closest-matching domain name from the fixed list \
+above as its own extra entry, so a niche interest still finds courses even when the \
+catalog has nothing that specific — e.g. a learner set on becoming a criminal lawyer who \
+mentions forensic science should get interests including both "forensic science" and \
+"Law". Only add a domain when one is a genuine, confident fit; never force one in.
 
 Respond with JSON only, matching the provided schema."""
 
