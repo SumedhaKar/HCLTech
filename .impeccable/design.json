@@ -26,7 +26,10 @@
       { "name": "stamped-disc", "value": "inset 0 2px 3px rgba(0,0,0,0.35), inset 0 -1px 1px rgba(255,255,255,0.15)", "purpose": "Numbered waypoint markers only." }
     ],
     "motion": [
-      { "name": "rise-in", "value": "700ms cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "One-time staggered entrance for route waypoints on initial paint. Additive only — never gates visibility, disabled under prefers-reduced-motion." }
+      { "name": "rise-in", "value": "700ms cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "One-time staggered entrance for route waypoints on initial paint. Additive only — never gates visibility, disabled under prefers-reduced-motion." },
+      { "name": "trail-draw", "value": "500ms cubic-bezier(0.16, 1, 0.3, 1), scaleY 0->1, transform-origin top", "purpose": "The dashed connector between homepage waypoints draws in from its marker rather than appearing all at once. Homepage only." },
+      { "name": "stamp", "value": "480ms cubic-bezier(0.16, 1, 0.3, 1), scale 1->1.22->0.94->1 with a shadow punch", "purpose": "Physical confirmation feedback when a waypoint marker's state actually changes: a chat-intake checklist field becoming known, or a dashboard path item marked Completed. Additive only — end state is identical without it." },
+      { "name": "contour-drift", "value": "animation-timeline: scroll(root block), translate3d drift", "purpose": "Homepage hero contour lines drift slowly as the visitor scrolls. Wrapped in @supports; degrades to the static lines with no motion on browsers without scroll-driven animation support." }
     ],
     "breakpoints": [
       { "name": "sm", "value": "640px" },

@@ -114,9 +114,12 @@ Earthy and muted, never neon or gradient-driven — colors read as pigment and p
 **Character:** A carved-sign slab paired with a wayfinding grotesk — confident and official-feeling without tipping into corporate or bookish. Mono is reserved for anything that reads as a stamped label or coordinate, never used as a "technical" costume.
 
 ### Hierarchy
-- **Display** (600, `clamp(2.25rem, 5vw, 3rem)`, 1.1 line-height): page-level headlines (hero H1, section H2s, card-name H3s all share this family at different sizes/weights).
-- **Body** (400, 1rem, 1.75 line-height): paragraph copy, max measure ~65ch.
+- **Display** (600, `clamp(2.25rem, 5vw, 3rem)`, 1.1 line-height): section H2s and card-name H3s. The homepage hero H1 is the one exception, carried at 700 weight rather than 600 — the single loudest statement in the product gets a weight step none of its neighbors use, so the hierarchy reads through weight as well as size.
+- **Body** (400, 1rem, 1.75 line-height): paragraph copy, max measure ~65ch. Conversational and explanatory content the visitor is meant to actually read — chat-intake bubbles, the explainer Q&A thread — is set at this floor, not the smaller label/meta size, even though it sits inside a compact panel.
 - **Label** (500, 0.6875rem, 0.14em tracking, uppercase): domain tags, milestone chips, grade labels, footer line — always mono, always tracked, never a substitute for a real heading.
+
+### Named Rules (headings)
+Every page carries exactly one H1. Heading levels never skip (an H1 is followed by an H2 before any H3 appears on that page) — a path item's or waypoint's title is an H2 when it is the only heading below the page's H1, not an H3 held over from a section heading that doesn't exist on that page.
 
 ### Named Rules
 **The No-Eyebrow Rule.** No small label ever sits directly above a heading as a kicker. Context that would have lived in an eyebrow belongs in the heading itself or the body copy beneath it.
@@ -161,11 +164,19 @@ Small, consistent radii throughout (`rounded-sm`, 2px) on cards, buttons, and ta
 ### Waypoint Marker (signature component)
 A 40px circle in the active difficulty-blaze color, holding the route-order number in mono, Trailhead Parchment text, with the stamped-disc inset shadow. Connected to the next marker by a 1px dashed vertical line in the section's hairline color. This is the system's signature device — any future "sequence" or "progress" UI should reuse this marker language rather than inventing a new one (e.g. a progress bar or step indicator). Reused directly (28px, same treatment) as the "trail permit" checklist marker on the chat-intake screen, filling from an empty hairline-ring outline to a solid grade-beginner disc with an authored checkmark SVG once a field is known.
 
+The homepage's example route is the one place this marker runs at full size — 56px, with the route-order number at a heavier weight and the connector line drawing itself in behind each marker as it appears (see The Stamped Confirmation, below) — because it is the flagship demonstration of the product's core mechanism to a first-time visitor. The dashboard's real, working version of the same list stays at the compact 40px scale: it is used repeatedly during real task completion, where density and scanability outrank spectacle. Same device, two deliberately different registers for two different jobs.
+
 ### Chat Bubbles
 Assistant messages: Trailhead Parchment background, Trail Ink text, hairline ring, left-aligned. User messages: Dusk Slate Blue background, Warm Trail Cream text, right-aligned, no ring (the color alone carries the distinction). Both share the 2px radius; no tails or carets.
 
 ### Status Pills
 A row of small fully-rounded pills (not the button radius) for a multi-state choice (waypoint status: not started / in progress / completed). The active pill fills with Burnt Rust Blaze and Trailhead Parchment text; inactive pills are text-only with a hairline ring. Deliberately reuses The One Blaze Rule rather than inventing status-specific colors — blaze means "the state you're in," not "success."
+
+### The Stamped Confirmation (motion)
+A brief weighted "stamp" (scale up, settle back, a punch of shadow) plays on a waypoint marker the instant it confirms something real: a trail-permit checklist field going from unknown to known on the chat-intake screen, or a path item being marked Completed on the dashboard. It replaces an instant, silent color swap with physical feedback that literalizes the trail-blaze metaphor — the marker is being stamped, not just recolored. Pure CSS keyframes (`.stamp` in `globals.css`), ~480ms, respects `prefers-reduced-motion`, and is purely additive: the end state is identical with or without it.
+
+### The Living Contour (homepage only)
+The topographic contour lines behind the homepage hero drift slowly as the visitor scrolls, tied to scroll position via `animation-timeline: scroll()` (`.contour-field`). Degrades to the existing static lines with no motion on browsers without scroll-driven animation support (Firefox) — the fallback is simply the pre-existing design, never a broken or empty state. This is a Persuade-surface-only device; the app pages (chat/dashboard/catalog/profile) stay still, per their Operate discipline.
 
 ## Do's and Don'ts
 

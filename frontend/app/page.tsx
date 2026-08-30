@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { CSSProperties } from "react";
 import RouteWaypoint from "./RouteWaypoint";
 
 type Grade = "beginner" | "intermediate" | "advanced";
@@ -94,7 +95,7 @@ export default function Home() {
 
         <div className="relative mx-auto grid max-w-5xl gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <div>
-            <h1 className="max-w-xl font-serif text-4xl font-semibold leading-[1.1] text-text [text-shadow:0_1px_0_rgba(0,0,0,0.4)] sm:text-5xl">
+            <h1 className="max-w-2xl font-serif text-4xl font-bold leading-[1.05] text-text [text-shadow:0_1px_0_rgba(0,0,0,0.4)] sm:text-6xl">
               Say where you want to go.
               <br />
               We&apos;ll mark the trail.
@@ -124,24 +125,25 @@ export default function Home() {
             time.
           </p>
 
-          <ol className="mt-10 flex flex-col">
+          <ol className="mt-12 flex flex-col">
             {EXAMPLE_ROUTE.map((wp, i) => (
               <RouteWaypoint key={wp.order} index={i}>
                 {i < EXAMPLE_ROUTE.length - 1 && (
                   <span
                     aria-hidden
-                    className="absolute left-[19px] top-10 h-[calc(100%-1rem)] w-px border-l-2 border-dashed border-signage-line"
+                    style={{ "--i": i } as CSSProperties}
+                    className="trail-line absolute left-[27px] top-14 h-[calc(100%-1.5rem)] w-px border-l-2 border-dashed border-signage-line"
                   />
                 )}
                 <span
-                  className={`absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-full font-mono text-sm font-medium text-signage shadow-[inset_0_2px_3px_rgba(0,0,0,0.35),inset_0_-1px_1px_rgba(255,255,255,0.15)] ${GRADE_CLASS[wp.grade]}`}
+                  className={`absolute left-0 top-0 flex h-14 w-14 items-center justify-center rounded-full font-mono text-lg font-semibold text-signage shadow-[inset_0_2px_3px_rgba(0,0,0,0.35),inset_0_-1px_1px_rgba(255,255,255,0.15)] ${GRADE_CLASS[wp.grade]}`}
                 >
                   {wp.order}
                 </span>
 
-                <div className="pb-10">
+                <div className="pb-14">
                   <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                    <h3 className="font-serif text-lg font-semibold text-ink">
+                    <h3 className="font-serif text-xl font-bold text-ink">
                       {wp.course}
                     </h3>
                     <span className="font-mono text-[11px] uppercase tracking-wide text-ink-muted">
@@ -197,7 +199,7 @@ export default function Home() {
 
 function GoalPanel() {
   return (
-    <div className="relative rounded-sm bg-signage p-6 text-ink shadow-[0_18px_40px_-16px_rgba(0,0,0,0.55)] sm:p-8">
+    <div className="relative rounded-sm bg-signage p-6 text-ink shadow-[0_18px_40px_-16px_rgba(0,0,0,0.55)] transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-[0_26px_54px_-14px_rgba(0,0,0,0.6)] sm:p-8">
       <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink-muted">
         Where are you headed?
       </p>
@@ -249,7 +251,7 @@ function ContourField() {
   return (
     <svg
       aria-hidden
-      className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.16]"
+      className="contour-field pointer-events-none absolute inset-0 h-full w-full opacity-[0.16]"
       preserveAspectRatio="xMaxYMin slice"
       viewBox="0 0 800 500"
       fill="none"

@@ -15,7 +15,7 @@ export default function RouteWaypoint({
 }) {
   return (
     <li
-      className="relative pl-14 rise-in"
+      className="relative pl-20 rise-in"
       style={{ "--i": index } as CSSProperties}
     >
       {children}

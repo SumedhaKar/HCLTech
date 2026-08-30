@@ -64,6 +64,9 @@ export default function ChatPage() {
   const [sending, setSending] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [stampedKeys, setStampedKeys] = useState<Set<ChecklistField["key"]>>(
+    new Set()
+  );
   const listRef = useRef<HTMLUListElement>(null);
 
   async function sendMessage(e: React.FormEvent) {
@@ -94,17 +97,27 @@ export default function ChatPage() {
       } = await res.json();
 
       setMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
-      setProfile((prev) => ({
-        goal: data.profilePatch.goal ?? prev.goal,
+
+      const newProfile: Profile = {
+        goal: data.profilePatch.goal ?? profile.goal,
         interests:
           data.profilePatch.interests && data.profilePatch.interests.length > 0
             ? data.profilePatch.interests
-            : prev.interests,
-        experienceLevel: data.profilePatch.experienceLevel ?? prev.experienceLevel,
-        completedCourseIds: prev.completedCourseIds,
+            : profile.interests,
+        experienceLevel: data.profilePatch.experienceLevel ?? profile.experienceLevel,
+        completedCourseIds: profile.completedCourseIds,
         timeBudgetHoursPerWeek:
-          data.profilePatch.timeBudgetHoursPerWeek ?? prev.timeBudgetHoursPerWeek,
-      }));
+          data.profilePatch.timeBudgetHoursPerWeek ?? profile.timeBudgetHoursPerWeek,
+      };
+      const newlyFilled = CHECKLIST.filter(
+        (f) => fieldValue(profile, f.key) === null && fieldValue(newProfile, f.key) !== null
+      ).map((f) => f.key);
+
+      setProfile(newProfile);
+      if (newlyFilled.length > 0) {
+        setStampedKeys(new Set(newlyFilled));
+        setTimeout(() => setStampedKeys(new Set()), 500);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
@@ -155,8 +168,8 @@ export default function ChatPage() {
                 key={i}
                 className={
                   m.role === "user"
-                    ? "ml-auto max-w-[80%] rounded-sm bg-waypoint-deep px-3.5 py-2.5 text-sm leading-6 text-signage"
-                    : "mr-auto max-w-[80%] rounded-sm bg-signage px-3.5 py-2.5 text-sm leading-6 text-ink ring-1 ring-signage-line"
+                    ? "ml-auto max-w-[80%] rounded-sm bg-waypoint-deep px-3.5 py-2.5 text-base leading-7 text-signage"
+                    : "mr-auto max-w-[80%] rounded-sm bg-signage px-3.5 py-2.5 text-base leading-7 text-ink ring-1 ring-signage-line"
                 }
               >
                 {m.content}
@@ -209,7 +222,9 @@ export default function ChatPage() {
                   <span
                     className={
                       filled
-                        ? "mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-grade-beginner text-signage shadow-[inset_0_2px_3px_rgba(0,0,0,0.35),inset_0_-1px_1px_rgba(255,255,255,0.15)]"
+                        ? `mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-grade-beginner text-signage shadow-[inset_0_2px_3px_rgba(0,0,0,0.35),inset_0_-1px_1px_rgba(255,255,255,0.15)] ${
+                            stampedKeys.has(field.key) ? "stamp" : ""
+                          }`
                         : "mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-ink-muted ring-1 ring-signage-line"
                     }
                     aria-hidden

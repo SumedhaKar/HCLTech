@@ -92,7 +92,7 @@ export default function DashboardPage() {
 
         {!loading && notFound && (
           <div className="rounded-sm bg-signage-raised p-8 text-center ring-1 ring-signage-line">
-            <h1 className="font-serif text-2xl font-semibold text-ink">
+            <h1 className="font-serif text-3xl font-semibold text-ink">
               No route marked yet
             </h1>
             <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-ink-muted">
@@ -152,6 +152,7 @@ function PathItemRow({
   onUpdate: (item: PathItem) => void;
 }) {
   const [updating, setUpdating] = useState(false);
+  const [stamped, setStamped] = useState(false);
   const [explainOpen, setExplainOpen] = useState(false);
   const [thread, setThread] = useState<{ question: string; answer: string }[]>([]);
   const [question, setQuestion] = useState("");
@@ -166,7 +167,13 @@ function PathItemRow({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });
-      if (res.ok) onUpdate(await res.json());
+      if (res.ok) {
+        onUpdate(await res.json());
+        if (status === "completed") {
+          setStamped(true);
+          setTimeout(() => setStamped(false), 500);
+        }
+      }
     } finally {
       setUpdating(false);
     }
@@ -203,16 +210,16 @@ function PathItemRow({
       <span
         className={`absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-full font-mono text-sm font-medium text-signage shadow-[inset_0_2px_3px_rgba(0,0,0,0.35),inset_0_-1px_1px_rgba(255,255,255,0.15)] ${
           course ? GRADE_CLASS[course.level] : "bg-grade-advanced"
-        }`}
+        } ${stamped ? "stamp" : ""}`}
       >
         {item.sequenceOrder}
       </span>
 
       <div className="pb-10">
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <h3 className="font-serif text-lg font-semibold text-ink">
+          <h2 className="font-serif text-lg font-semibold text-ink">
             {course?.title ?? "Course"}
-          </h3>
+          </h2>
           {course && (
             <span className="font-mono text-[11px] uppercase tracking-wide text-ink-muted">
               {course.domain}
@@ -277,7 +284,7 @@ function PathItemRow({
                   <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-waypoint-deep">
                     {t.question}
                   </p>
-                  <p className="mt-1.5 text-sm leading-6 text-ink">{t.answer}</p>
+                  <p className="mt-1.5 text-base leading-7 text-ink">{t.answer}</p>
                 </div>
               ))}
               {asking && (
