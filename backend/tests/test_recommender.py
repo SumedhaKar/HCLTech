@@ -8,7 +8,13 @@ from __future__ import annotations
 import pytest
 
 from app.services import recommender
-from app.services.recommender import Course, LearnerProfile, build_learning_path, filter_candidates
+from app.services.recommender import (
+    MAX_PATH_LENGTH,
+    Course,
+    LearnerProfile,
+    build_learning_path,
+    filter_candidates,
+)
 
 
 def _course(**kwargs) -> Course:
@@ -112,7 +118,11 @@ def test_filter_restricts_level_to_at_most_one_step_above_learner():
     assert {c.id for c in result} == {"c1", "c2"}
 
 
-def test_filter_falls_back_to_full_pool_when_no_interest_matches():
+def test_filter_returns_nothing_when_stated_interests_match_no_eligible_course():
+    # A learner who states interests gets nothing rather than an irrelevant
+    # full-pool fallback — a short, honest path (or none) beats a full one
+    # padded with unrelated content. The router surfaces this as "no
+    # suitable courses found" rather than forcing a bad recommendation.
     profile = LearnerProfile(
         goal="learn something",
         interests=["astrophysics"],
@@ -123,7 +133,67 @@ def test_filter_falls_back_to_full_pool_when_no_interest_matches():
 
     result = filter_candidates(profile, courses)
 
-    assert [c.id for c in result] == ["c1"]
+    assert result == []
+
+
+def test_filter_does_not_backfill_from_unrelated_domains_when_matches_are_thin():
+    # Regression test: a learner asking about Law should never see
+    # Cybersecurity or any other unrelated domain just because Law itself
+    # only has a couple of eligible courses. Fewer, correct results beat a
+    # full path padded with "closest by embedding distance" noise.
+    profile = LearnerProfile(
+        goal="become a lawyer",
+        interests=["law"],
+        experience_level="beginner",
+        completed_course_ids=[],
+    )
+    law_courses = [
+        _course(id="law1", title="Intro to Law", domain="Law", skills_taught=["legal-fundamentals"]),
+        _course(id="law2", title="Contract Law", domain="Law", skills_taught=["contract-law"]),
+    ]
+    unrelated = [
+        _course(id=f"other{i}", title=f"Course {i}", domain="Cybersecurity", skills_taught=["security-fundamentals"])
+        for i in range(5)
+    ]
+
+    result = filter_candidates(profile, law_courses + unrelated)
+
+    assert {c.id for c in result} == {"law1", "law2"}
+
+
+def test_filter_keeps_interest_matches_when_they_already_fill_a_path():
+    profile = LearnerProfile(
+        goal="learn python",
+        interests=["python"],
+        experience_level="beginner",
+        completed_course_ids=[],
+    )
+    matched = [_course(id=f"py{i}", title=f"Python {i}", domain="Python", skills_taught=["python"]) for i in range(MAX_PATH_LENGTH)]
+    unrelated = [_course(id="unrelated", title="Pottery Basics", domain="Crafts", skills_taught=["pottery"])]
+
+    result = filter_candidates(profile, matched + unrelated)
+
+    assert {c.id for c in result} == {c.id for c in matched}
+
+
+def test_filter_ignores_single_letter_skill_tag_false_positives():
+    # Regression test: a one-letter skill tag like "c" (the language) is a
+    # substring of almost any phrase — e.g. "content creation" — and must
+    # not count as a match on that basis alone.
+    profile = LearnerProfile(
+        goal="pursue a career in marketing",
+        interests=["marketing", "content creation"],
+        experience_level="beginner",
+        completed_course_ids=[],
+    )
+    courses = [
+        _course(id="cs50", title="CS50", domain="Programming Fundamentals", skills_taught=["programming-fundamentals", "c", "algorithms"]),
+        _course(id="mkt1", title="Content Marketing Certification", domain="Marketing", skills_taught=["content-marketing"]),
+    ]
+
+    result = filter_candidates(profile, courses)
+
+    assert {c.id for c in result} == {"mkt1"}
 
 
 def test_build_learning_path_ranks_by_similarity_and_orders_by_level(monkeypatch: pytest.MonkeyPatch):

@@ -33,7 +33,7 @@ The app runs against a single seeded mock learner — no login, no session UI (s
 - Conversational intake (Gemini structured extraction) turns a natural-language goal statement into a learner-profile patch: goal, interests, experience level, completed courses, time budget per week.
 - Hybrid recommendation engine: rule-based prerequisite/tag filtering first (always shippable on its own), Gemini-embedding similarity ranking layered on top. Generates a sequenced learning path with milestones and a per-item rationale.
 - Explainer/Q&A endpoint answers a learner's free-text questions about why a specific path item was recommended, using the surrounding path as context.
-- Catalog: 49 real seeded courses (real titles, descriptions, and external source URLs — not fabricated), spanning multiple tech domains: Programming Fundamentals, Web Development, Cybersecurity, Data, Mobile, and others.
+- Catalog: 103 real seeded courses (real titles, descriptions, and external source URLs — not fabricated), spanning 17 domains: the original 7 tech domains (Programming Fundamentals, Web Development, Data Science & Machine Learning, Cloud & DevOps, Cybersecurity, Mobile Development, UX & Product Design) plus 10 non-tech domains added to actually deliver on "any domain" below (Marketing, Business & Management, Finance & Accounting, Design, Basic Sciences, Bio Sciences, Law, Mechanical Engineering, Civil Engineering, Electrical Engineering — see `supabase/seed/0002_courses_expansion.sql`).
 - No auth for the MVP — a single fixed mock learner ID, no account/session UI anywhere. Additive if auth is ever added later, not a rework (see docs/adr/0005).
 - Service boundary: Next.js owns CRUD (learner profile, learning path, catalog browsing); FastAPI owns the AI/ML surface (chat intake, recommendations, path generation, explainer) — see docs/adr/0004.
 - Free-tier operating risk that can surface live during a demo or judging session: Supabase's free tier auto-pauses after 7 days of inactivity and only resumes manually (no auto-wake on traffic); Render's free tier has cold starts; Gemini's free tier has rate limits.
@@ -44,8 +44,8 @@ Product name is **PathFinder** — confirmed as the real brand name, not a place
 
 ## Evidence on Hand
 
-- 49 real seeded courses in the live database (title, description, domain, level, skills taught, prerequisite skills, and a real external `sourceUrl` per course) — genuine catalog content, not placeholder data.
-- One seeded mock learner in the live Supabase database, currently holding real Gemini-generated demo data matching the confirmed persona above (goal "Become a backend engineer," beginner, 6 hrs/week, interests backend/databases/apis) and two generated learning paths from live testing.
+- 103 real seeded courses in the live database (title, description, domain, level, skills taught, prerequisite skills, and a real external `sourceUrl` per course) — genuine catalog content, not placeholder data, across 17 domains (see Capabilities and Constraints above).
+- One seeded mock learner in the live Supabase database. Its `learner_profiles` row is reset to empty between test passes rather than left holding whatever a given testing session generated — treat its current contents as transient, not fixture data to design against.
 - No testimonials, press, case studies, user research, or additional learner data exist. Future work must not fabricate any of these.
 
 ## Product Principles

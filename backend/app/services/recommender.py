@@ -73,12 +73,27 @@ def _known_skills(completed_courses: List[Course]) -> set[str]:
     return skills
 
 
+_MIN_MATCH_LENGTH = 3
+
+
 def _matches_interest(course: Course, interests_lower: set[str]) -> bool:
+    # Domain and skill tags only — title/description text was tried and
+    # dropped: a short interest word can appear incidentally in an unrelated
+    # course's free-text description (e.g. "systems") and pull in exactly
+    # the kind of irrelevant result this filter exists to keep out.
+    #
+    # Substring containment also requires both sides to clear
+    # _MIN_MATCH_LENGTH: a single-letter skill tag like "c" (the language,
+    # from CS50) is trivially "contained in" almost any phrase — e.g.
+    # "content creation" — which produced exactly the kind of false, unrelated
+    # match this filter exists to prevent.
     fields = [course.domain.lower(), *[s.lower() for s in course.skills_taught]]
     for interest in interests_lower:
-        if not interest:
+        if len(interest) < _MIN_MATCH_LENGTH:
             continue
         for field in fields:
+            if len(field) < _MIN_MATCH_LENGTH:
+                continue
             if interest in field or field in interest:
                 return True
     return False
@@ -112,15 +127,16 @@ def filter_candidates(profile: LearnerProfile, courses: List[Course]) -> List[Co
 
     base_pool = [c for c in courses if eligible(c)]
 
-    if interests_lower:
-        interest_matched = [c for c in base_pool if _matches_interest(c, interests_lower)]
-        if interest_matched:
-            return interest_matched
-
-    # No stated interests, or none of them matched anything eligible — fall
-    # back to the full prerequisite/level-eligible pool so the learner still
-    # gets a path rather than an empty one.
-    return base_pool
+    # With no stated interests there's no relevance signal to filter by, so
+    # the full eligible pool is the honest answer. With stated interests,
+    # a course must actually match one — a short, correct path is what the
+    # learner asked for, not a full one padded with whatever the embedding
+    # ranker considers "closest of what's left" (that ranking is noisy
+    # enough across unrelated domains to resurface exactly the irrelevant
+    # results this filter exists to prevent; see docs/adr/0003).
+    if not interests_lower:
+        return base_pool
+    return [c for c in base_pool if _matches_interest(c, interests_lower)]
 
 
 def _course_text(course: Course) -> str:
