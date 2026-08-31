@@ -32,9 +32,15 @@ const STATUS_LABEL: Record<PathItemStatus, string> = {
 
 const STATUS_ORDER: PathItemStatus[] = ["not_started", "in_progress", "completed"];
 
+type LearnerTimeProfile = {
+  experienceLevel: "beginner" | "intermediate" | "advanced" | null;
+  timeBudgetHoursPerWeek: number | null;
+};
+
 export default function DashboardPage() {
   const [path, setPath] = useState<LearningPath | null>(null);
   const [courses, setCourses] = useState<Record<string, Course>>({});
+  const [profile, setProfile] = useState<LearnerTimeProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,10 +58,12 @@ export default function DashboardPage() {
       fetch("/api/courses")
         .then((res) => res.json())
         .then((data: { courses: Course[] }) => data.courses ?? []),
+      fetch("/api/learner-profile").then((res) => res.json()) as Promise<LearnerTimeProfile>,
     ])
-      .then(([pathData, courseList]) => {
+      .then(([pathData, courseList, profileData]) => {
         setPath(pathData);
         setCourses(Object.fromEntries(courseList.map((c) => [c.id, c])));
+        setProfile(profileData);
       })
       .catch((err: unknown) =>
         setError(err instanceof Error ? err.message : "Something went wrong.")
@@ -89,6 +97,30 @@ export default function DashboardPage() {
         }
         for (const skill of gained) ahead.delete(skill);
         return { gained: [...gained], ahead: [...ahead] };
+      })()
+    : null;
+
+  // Real, unadjusted course durations — total stays fixed at the full path's
+  // duration; remaining is the same sum restricted to items not yet marked
+  // completed, so it shrinks live as items are completed (no separate
+  // recompute needed — this runs on every render off current item status).
+  const timeEstimate = path
+    ? (() => {
+        let totalHours = 0;
+        let remainingHours = 0;
+        for (const item of path.items) {
+          const course = courses[item.courseId];
+          if (!course) continue;
+          totalHours += course.durationHours;
+          if (item.status !== "completed") remainingHours += course.durationHours;
+        }
+        const perWeek = profile?.timeBudgetHoursPerWeek ?? null;
+        return {
+          totalHours,
+          remainingHours,
+          totalWeeks: perWeek ? Math.ceil(totalHours / perWeek) : null,
+          remainingWeeks: perWeek ? Math.ceil(remainingHours / perWeek) : null,
+        };
       })()
     : null;
 
@@ -141,6 +173,41 @@ export default function DashboardPage() {
             {skillProgress && (skillProgress.gained.length > 0 || skillProgress.ahead.length > 0) && (
               <div className="rounded-[20px] bg-surface p-6 ring-1 ring-border">
                 <h2 className="font-serif text-xl font-semibold text-text">Skill development</h2>
+
+                {timeEstimate && (
+                  <div className="mt-4 flex flex-col gap-1.5 border-b border-border pb-4">
+                    <p className="text-sm text-text">
+                      {timeEstimate.totalHours} hrs total
+                      {timeEstimate.totalWeeks !== null && (
+                        <span className="text-text-muted">
+                          {" "}
+                          (~{timeEstimate.totalWeeks} {timeEstimate.totalWeeks === 1 ? "week" : "weeks"} at{" "}
+                          {profile?.timeBudgetHoursPerWeek} hrs/week)
+                        </span>
+                      )}
+                    </p>
+                    <p className="text-sm text-text">
+                      {timeEstimate.remainingHours} hrs remaining
+                      {timeEstimate.remainingWeeks !== null && (
+                        <span className="text-text-muted">
+                          {" "}
+                          (~{timeEstimate.remainingWeeks} {timeEstimate.remainingWeeks === 1 ? "week" : "weeks"} at{" "}
+                          {profile?.timeBudgetHoursPerWeek} hrs/week)
+                        </span>
+                      )}
+                    </p>
+                    {(profile?.experienceLevel === "intermediate" || profile?.experienceLevel === "advanced") && (
+                      <p className="text-sm text-text-muted">
+                        You&rsquo;re already ahead with {profile.experienceLevel}-level experience — you&rsquo;ll
+                        likely move through this faster than the estimate above.
+                      </p>
+                    )}
+                    <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-text-faint">
+                      Consistency is the key, not intensity!
+                    </p>
+                  </div>
+                )}
+
                 <div className="mt-4 flex flex-col gap-4">
                   {skillProgress.gained.length > 0 && (
                     <div>
