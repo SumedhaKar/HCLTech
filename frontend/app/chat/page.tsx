@@ -202,6 +202,11 @@ export default function ChatPage() {
               Send
             </button>
           </form>
+          {messages.length <= 1 && (
+            <p className="border-t border-border px-4 py-2 text-center font-mono text-[10px] uppercase tracking-wide text-text-faint">
+              First message today may take up to a minute while the server wakes up.
+            </p>
+          )}
         </div>
 
         {/* Trail permit checklist */}

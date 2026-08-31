@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import SiteHeader from "../components/SiteHeader";
 import { BACKEND_URL } from "../lib/backend";
+import { MOCK_LEARNER_ID } from "../lib/constants";
 import type { LearningPath, PathItem, PathItemStatus } from "../lib/learningPath";
 
 type Course = {
@@ -35,6 +36,7 @@ const STATUS_ORDER: PathItemStatus[] = ["not_started", "in_progress", "completed
 type LearnerTimeProfile = {
   experienceLevel: "beginner" | "intermediate" | "advanced" | null;
   timeBudgetHoursPerWeek: number | null;
+  completedCourseIds: string[];
 };
 
 export default function DashboardPage() {
@@ -44,6 +46,8 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [regenerating, setRegenerating] = useState(false);
+  const [regenError, setRegenError] = useState<string | null>(null);
 
   useEffect(() => {
     Promise.all([
@@ -77,6 +81,62 @@ export default function DashboardPage() {
         ? { ...prev, items: prev.items.map((i) => (i.id === updated.id ? updated : i)) }
         : prev
     );
+  }
+
+  // Keeps learner_profiles.completed_course_ids in sync with per-item status
+  // on this path, scoped only to courses that are actual items here — a
+  // course marked complete elsewhere (e.g. during chat intake) is untouched.
+  // This is what lets the recommendation engine's prerequisite/known-skills
+  // logic (filter_candidates) actually see progress on Regenerate; without
+  // it, completing an item here was invisible to the engine.
+  async function syncCompletion(courseId: string, isCompleted: boolean) {
+    if (!profile) return;
+    const alreadyMarked = profile.completedCourseIds.includes(courseId);
+    if (isCompleted === alreadyMarked) return;
+
+    const nextIds = isCompleted
+      ? [...profile.completedCourseIds, courseId]
+      : profile.completedCourseIds.filter((id) => id !== courseId);
+
+    setProfile({ ...profile, completedCourseIds: nextIds });
+
+    try {
+      const res = await fetch("/api/learner-profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ completedCourseIds: nextIds }),
+      });
+      if (!res.ok) throw new Error();
+    } catch {
+      setRegenError(
+        "Couldn't save that completion to your profile — Regenerate may not reflect it yet."
+      );
+    }
+  }
+
+  async function regeneratePath() {
+    setRegenerating(true);
+    setRegenError(null);
+    try {
+      const genRes = await fetch(`${BACKEND_URL}/recommendations/generate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ learnerId: MOCK_LEARNER_ID }),
+      });
+      if (!genRes.ok) {
+        const body = await genRes.json().catch(() => ({}));
+        throw new Error(body.error ?? "Couldn't regenerate your path just now.");
+      }
+      const pathRes = await fetch("/api/learning-path");
+      if (!pathRes.ok) throw new Error("Regenerated, but couldn't reload the updated path.");
+      const newPath = (await pathRes.json()) as LearningPath;
+      setPath(newPath);
+      setNotFound(false);
+    } catch (err) {
+      setRegenError(err instanceof Error ? err.message : "Something went wrong.");
+    } finally {
+      setRegenerating(false);
+    }
   }
 
   const completedCount = path?.items.filter((i) => i.status === "completed").length ?? 0;
@@ -161,14 +221,31 @@ export default function DashboardPage() {
 
         {!loading && path && (
           <>
-            <div>
-              <h1 className="font-serif text-3xl font-semibold leading-tight text-text">
-                Route toward &ldquo;{path.goal}&rdquo;
-              </h1>
-              <p className="mt-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-text-muted">
-                {completedCount} of {path.items.length} waypoints complete
-              </p>
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h1 className="font-serif text-3xl font-semibold leading-tight text-text">
+                  Route toward &ldquo;{path.goal}&rdquo;
+                </h1>
+                <p className="mt-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-text-muted">
+                  {completedCount} of {path.items.length} waypoints complete
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={regeneratePath}
+                disabled={regenerating}
+                title="Rebuilds your path from what you've completed so far — may take up to a minute if the server's been idle."
+                className="shrink-0 rounded-full px-4 py-2 font-mono text-[11px] uppercase tracking-wide text-text-muted ring-1 ring-border transition-colors hover:bg-surface-raised disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {regenerating ? "Regenerating…" : "Regenerate path"}
+              </button>
             </div>
+
+            {regenError && (
+              <p className="rounded-xl bg-blaze/10 px-3 py-2.5 text-sm text-blaze-glow ring-1 ring-blaze/30">
+                {regenError}
+              </p>
+            )}
 
             {skillProgress && (skillProgress.gained.length > 0 || skillProgress.ahead.length > 0) && (
               <div className="rounded-[20px] bg-surface p-6 ring-1 ring-border">
@@ -258,6 +335,7 @@ export default function DashboardPage() {
                     course={courses[item.courseId]}
                     isLast={i === arr.length - 1}
                     onUpdate={updateItem}
+                    onCompletionChange={syncCompletion}
                   />
                 ))}
             </ol>
@@ -273,11 +351,13 @@ function PathItemRow({
   course,
   isLast,
   onUpdate,
+  onCompletionChange,
 }: {
   item: PathItem;
   course: Course | undefined;
   isLast: boolean;
   onUpdate: (item: PathItem) => void;
+  onCompletionChange: (courseId: string, isCompleted: boolean) => void;
 }) {
   const [updating, setUpdating] = useState(false);
   const [stamped, setStamped] = useState(false);
@@ -297,6 +377,7 @@ function PathItemRow({
       });
       if (res.ok) {
         onUpdate(await res.json());
+        onCompletionChange(item.courseId, status === "completed");
         if (status === "completed") {
           setStamped(true);
           setTimeout(() => setStamped(false), 500);
