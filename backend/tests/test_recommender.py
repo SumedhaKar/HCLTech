@@ -521,3 +521,28 @@ def test_build_learning_path_ranks_specific_matches_ahead_of_domain_only_ones(
 
     assert len(path) == MAX_PATH_LENGTH
     assert "sql" in {entry.course.id for entry in path}
+
+
+def test_filter_ignores_skill_tag_that_contains_an_unrelated_interest_as_a_substring():
+    # Regression test: reproduces a real bug found live. A skill tag named
+    # "vector-databases" (for the Vector Databases course) literally
+    # contains the word "databases" — so a "become a backend engineer"
+    # learner whose stated interest is "databases" (meaning SQL/MongoDB)
+    # matched a completely unrelated AI/RAG course purely because the tag
+    # happened to contain that substring. Fixed by renaming the tag to
+    # "vector-search"; this test locks in that a tag containing an existing
+    # interest word as a substring must not silently match on it.
+    profile = LearnerProfile(
+        goal="become a backend engineer",
+        interests=["backend", "databases"],
+        experience_level="beginner",
+        completed_course_ids=[],
+    )
+    courses = [
+        _course(id="mongo", title="Node.js, Express, MongoDB & More", domain="Web Development", level="beginner", skills_taught=["nodejs", "express", "mongodb"]),
+        _course(id="vectors", title="Vector Databases: from Embeddings to Applications", domain="Data Science & Machine Learning", level="intermediate", skills_taught=["vector-search"]),
+    ]
+
+    result = filter_candidates(profile, courses)
+
+    assert {c.id for c in result} == {"mongo"}
