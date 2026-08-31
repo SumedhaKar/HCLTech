@@ -26,7 +26,7 @@ Not a flat, one-size-fits-all course recommendation list — the team explicitly
 
 Built solo for HCLTech's AMPlified Round 2 hackathon (team "Meteors"), deadline 31 Aug 2026 11:59pm IST. Judged against six weighted criteria: Problem Understanding & Solution Design (20%), Functionality & Feature Completeness (25%), AI/ML Implementation (20%), Innovation & Creativity (15%), User Experience & Interface (10%), Performance & Code Quality (10%) — see docs/reference/ for the original screenshots. Five deliverables are required: source ZIP, GitHub repo, solution documentation, a 3–5 minute demo video, and a deployed application URL.
 
-The app runs against a single seeded mock learner — no login, no session UI (see Capabilities). Two live surfaces exist today: a course catalog browse page (frontend/app/catalog), and a set of API-only endpoints (learner-profile, learning-path, chat intake, recommendations, explainer) with no dedicated UI built yet — the homepage is still the unmodified create-next-app scaffold.
+The app runs against a single seeded mock learner — no login, no session UI (see Capabilities). Five live UI surfaces exist today, all styled to the Night Trail design system (see DESIGN.md): the homepage (frontend/app/page.tsx), course catalog browse (frontend/app/catalog), chat-based intake (frontend/app/chat), the learning-path dashboard (frontend/app/dashboard), and a learner-profile view/edit screen (frontend/app/profile) — plus the underlying API surface (learner-profile, learning-path, chat intake, recommendations, explainer) all of them call into.
 
 ## Capabilities and Constraints
 
@@ -40,12 +40,12 @@ The app runs against a single seeded mock learner — no login, no session UI (s
 
 ## Brand Commitments
 
-Product name is **PathFinder** — confirmed as the real brand name, not a placeholder. Design should use it as the actual product name (wordmark/logo treatment, page titles, etc.). No visual identity exists yet beyond the name itself.
+Product name is **PathFinder** — confirmed as the real brand name, not a placeholder. Design should use it as the actual product name (wordmark/logo treatment, page titles, etc.). A full visual identity now exists — "The Night Trail," a near-black monochrome system with a single saturated accent, documented in DESIGN.md — applied consistently across every live surface.
 
 ## Evidence on Hand
 
 - 103 real seeded courses in the live database (title, description, domain, level, skills taught, prerequisite skills, and a real external `sourceUrl` per course) — genuine catalog content, not placeholder data, across 17 domains (see Capabilities and Constraints above).
-- One seeded mock learner in the live Supabase database. Its `learner_profiles` row is reset to empty between test passes rather than left holding whatever a given testing session generated — treat its current contents as transient, not fixture data to design against.
+- One seeded mock learner in the live Supabase database, deliberately fixed to the confirmed demo persona above (goal, interests, experience level, time budget) with a matching generated path. Ad hoc testing against the live API must restore this state afterward rather than leave it holding whatever a given session last generated — a stray profile from a debugging pass has previously leaked into what a judge would see live.
 - No testimonials, press, case studies, user research, or additional learner data exist. Future work must not fabricate any of these.
 
 ## Product Principles
