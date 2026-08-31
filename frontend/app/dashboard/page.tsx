@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import SiteHeader from "../components/SiteHeader";
 import { BACKEND_URL } from "../lib/backend";
 import { MOCK_LEARNER_ID } from "../lib/constants";
 import type { LearningPath, PathItem, PathItemStatus } from "../lib/learningPath";
+import { suggestProject } from "../lib/projectSuggestions";
 
 type Course = {
   id: string;
@@ -184,6 +185,37 @@ export default function DashboardPage() {
       })()
     : null;
 
+  // One suggested project per milestone tier (Foundations / Core Skills /
+  // Advanced Practice), not per course — build_learning_path already sorts
+  // items by level before assigning sequenceOrder, so same-milestone items
+  // are always contiguous and can be grouped by a single pass in order.
+  const milestoneProjects = path
+    ? (() => {
+        const sorted = path.items.slice().sort((a, b) => a.sequenceOrder - b.sequenceOrder);
+        const groups = new Map<string, { skills: Set<string>; domain: string }>();
+        for (const item of sorted) {
+          const label = item.milestoneLabel;
+          const course = courses[item.courseId];
+          if (!label || !course) continue;
+          if (!groups.has(label)) groups.set(label, { skills: new Set(), domain: course.domain });
+          const group = groups.get(label)!;
+          // Only the course's first 2 skills count toward the tier's project
+          // signal — mirrors the backend's own top_skills convention for
+          // rationale text (skills_taught[:2]). A broad course can teach more
+          // than that (e.g. Odin Project, tagged beginner, also lists react
+          // and nodejs), and without this cap its later, more "advanced"
+          // skills could hijack a Foundations-tier suggestion toward content
+          // the learner hasn't actually reached yet in this path.
+          for (const skill of course.skillsTaught.slice(0, 2)) group.skills.add(skill);
+        }
+        const result = new Map<string, string>();
+        for (const [label, group] of groups) {
+          result.set(label, suggestProject([...group.skills], group.domain));
+        }
+        return result;
+      })()
+    : null;
+
   return (
     <div className="flex flex-1 flex-col bg-ground text-text">
       <SiteHeader active="/dashboard" />
@@ -325,19 +357,42 @@ export default function DashboardPage() {
             )}
 
             <ol className="mt-4 flex flex-col">
-              {path.items
-                .slice()
-                .sort((a, b) => a.sequenceOrder - b.sequenceOrder)
-                .map((item, i, arr) => (
-                  <PathItemRow
-                    key={item.id}
-                    item={item}
-                    course={courses[item.courseId]}
-                    isLast={i === arr.length - 1}
-                    onUpdate={updateItem}
-                    onCompletionChange={syncCompletion}
-                  />
-                ))}
+              {(() => {
+                let prevMilestone: string | null = null;
+                return path.items
+                  .slice()
+                  .sort((a, b) => a.sequenceOrder - b.sequenceOrder)
+                  .map((item, i, arr) => {
+                    const showProject =
+                      item.milestoneLabel !== null &&
+                      item.milestoneLabel !== prevMilestone &&
+                      milestoneProjects?.has(item.milestoneLabel);
+                    prevMilestone = item.milestoneLabel ?? prevMilestone;
+                    return (
+                      <Fragment key={item.id}>
+                        {showProject && item.milestoneLabel && (
+                          <li className="relative mb-4 list-none pl-14">
+                            <div className="rounded-xl bg-surface-raised p-4 ring-1 ring-border">
+                              <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-text-muted">
+                                Suggested project — {item.milestoneLabel}
+                              </p>
+                              <p className="mt-1.5 text-sm leading-6 text-text">
+                                {milestoneProjects!.get(item.milestoneLabel)}
+                              </p>
+                            </div>
+                          </li>
+                        )}
+                        <PathItemRow
+                          item={item}
+                          course={courses[item.courseId]}
+                          isLast={i === arr.length - 1}
+                          onUpdate={updateItem}
+                          onCompletionChange={syncCompletion}
+                        />
+                      </Fragment>
+                    );
+                  });
+              })()}
             </ol>
           </>
         )}
