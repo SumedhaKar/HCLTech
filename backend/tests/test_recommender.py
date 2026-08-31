@@ -473,3 +473,51 @@ def test_filter_matches_data_analyst_interest_to_sql_and_excel():
     # test isolates the specific fix: SQL and Excel, in two other domains
     # entirely, now match too, while a genuinely unrelated course does not.
     assert {c.id for c in result} == {"sql", "excel"}
+
+
+def test_build_learning_path_ranks_specific_matches_ahead_of_domain_only_ones(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    # Regression test: reproduces the live bug directly. SQL matched via the
+    # "data analyst" alias — a real, specific relevance signal — but scored
+    # lower on embedding similarity than several courses that only matched
+    # because they share a domain name with the broader "Data Science &
+    # Machine Learning" grounding interest, and got cut from the top
+    # MAX_PATH_LENGTH entirely. A specific match must always win a slot over
+    # a same-domain-only one, regardless of embedding score.
+    profile = LearnerProfile(
+        goal="become a data analyst",
+        interests=["data analyst", "Data Science & Machine Learning"],
+        experience_level="beginner",
+        completed_course_ids=[],
+    )
+    courses = [
+        _course(id="sql", title="Introduction to SQL", domain="Programming Fundamentals", level="beginner", skills_taught=["sql-basics"]),
+    ] + [
+        _course(
+            id=f"dsml{i}",
+            title=f"DS&ML Course {i}",
+            domain="Data Science & Machine Learning",
+            level="beginner",
+            skills_taught=[f"skill-{i}"],
+        )
+        for i in range(MAX_PATH_LENGTH)
+    ]
+
+    def fake_embed_texts(texts: list[str]) -> list[list[float]]:
+        vectors = []
+        for t in texts:
+            if t.startswith("Goal:"):
+                vectors.append([1.0, 0.0])
+            elif "Introduction to SQL" in t:
+                vectors.append([0.0, 1.0])  # orthogonal - lowest possible score
+            else:
+                vectors.append([1.0, 0.0])  # perfect match - highest possible score
+        return vectors
+
+    monkeypatch.setattr(recommender, "embed_texts", fake_embed_texts)
+
+    path = build_learning_path(profile, courses)
+
+    assert len(path) == MAX_PATH_LENGTH
+    assert "sql" in {entry.course.id for entry in path}

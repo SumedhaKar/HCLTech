@@ -157,8 +157,32 @@ def _matches_interest(course: Course, interests_lower: set[str]) -> bool:
     # from CS50) is trivially "contained in" almost any phrase — e.g.
     # "content creation" — which produced exactly the kind of false, unrelated
     # match this filter exists to prevent.
-    skill_fields = [s.lower() for s in course.skills_taught]
+    if _matches_interest_specifically(course, interests_lower):
+        return True
+
     domain_field = course.domain.lower()
+    for interest in interests_lower:
+        if len(interest) < _MIN_MATCH_LENGTH:
+            continue
+        if (
+            domain_field not in _DOMAIN_MATCH_TOO_BROAD
+            and len(domain_field) >= _MIN_MATCH_LENGTH
+            and (interest in domain_field or domain_field in interest)
+        ):
+            return True
+    return False
+
+
+def _matches_interest_specifically(course: Course, interests_lower: set[str]) -> bool:
+    # Skill-tag substring or alias match only — no domain-name fallback. Used
+    # both by _matches_interest (as one of two ways in) and, separately, by
+    # build_learning_path to rank a real skill-level match ahead of a course
+    # that only got in on a domain-name coincidence (see build_learning_path
+    # for why: a bare domain match is a much weaker relevance signal, and
+    # letting it outrank a specific match in the final ranked cut was exactly
+    # how a "data analyst" path lost its SQL course to same-domain ML/DL
+    # content that only shared a domain name, not actual relevance).
+    skill_fields = [s.lower() for s in course.skills_taught]
     for interest in interests_lower:
         if len(interest) < _MIN_MATCH_LENGTH:
             continue
@@ -167,12 +191,6 @@ def _matches_interest(course: Course, interests_lower: set[str]) -> bool:
                 continue
             if interest in field or field in interest:
                 return True
-        if (
-            domain_field not in _DOMAIN_MATCH_TOO_BROAD
-            and len(domain_field) >= _MIN_MATCH_LENGTH
-            and (interest in domain_field or domain_field in interest)
-        ):
-            return True
         if _alias_tags_for(interest, skill_fields):
             return True
     return False
@@ -363,6 +381,29 @@ def rank_candidates(profile: LearnerProfile, candidates: List[Course]) -> List[T
 def build_learning_path(profile: LearnerProfile, courses: List[Course]) -> List[PathEntry]:
     candidates = filter_candidates(profile, courses)
     ranked = rank_candidates(profile, candidates)
+
+    # A course that specifically teaches a matched skill is a stronger,
+    # more trustworthy relevance signal than one that only shares a domain
+    # name with an interest (e.g. a Gemini-appended grounding interest like
+    # "Data Science & Machine Learning") — but embedding similarity doesn't
+    # know that distinction, and can rank a domain-coincidence match above a
+    # genuinely on-topic one. Concretely: for "become a data analyst",
+    # Introduction to SQL (a real, specific match via the "data analyst"
+    # alias) was getting outranked by same-domain ML/deep-learning courses
+    # that only matched because they happen to share a domain name with the
+    # broader grounding interest, and fell out of the top MAX_PATH_LENGTH
+    # entirely. Specific matches are stable-sorted ahead of domain-only ones
+    # before truncating, so real relevance always wins a spot over a
+    # same-domain coincidence; embedding score still orders within each tier.
+    interests_lower = {i.lower() for i in profile.interests if i}
+    if interests_lower:
+        ranked.sort(
+            key=lambda pair: (
+                0 if _matches_interest_specifically(pair[0], interests_lower) else 1,
+                -pair[1],
+            )
+        )
+
     top = ranked[:MAX_PATH_LENGTH]
 
     # Order the path itself by level progression (beginner -> advanced), using
@@ -371,7 +412,6 @@ def build_learning_path(profile: LearnerProfile, courses: List[Course]) -> List[
     # relevance-sorted list.
     top.sort(key=lambda pair: (_LEVEL_RANK.get(pair[0].level, 0), -pair[1]))
 
-    interests_lower = {i.lower() for i in profile.interests if i}
     entries: List[PathEntry] = []
     for idx, (course, score) in enumerate(top, start=1):
         entries.append(
