@@ -244,6 +244,31 @@ def test_filter_excludes_broad_domain_courses_that_dont_teach_a_matched_skill():
     assert {c.id for c in result} == {"fullstack"}
 
 
+def test_filter_matches_broad_domain_when_it_is_the_only_stated_interest():
+    # Regression test: "become a web developer" goes through the chat flow,
+    # and on the follow-up turn Gemini re-summarizes the profile down to
+    # interests=["web development", "Web Development"] — the same word,
+    # re-cased across two calls, nothing narrower alongside it. The broad-
+    # domain block (needed so "backend" + "web development" doesn't pull in
+    # CSS-only courses, see test above) was also blocking this case, where
+    # there's no narrower interest left to protect and the learner asked for
+    # exactly this domain.
+    profile = LearnerProfile(
+        goal="become a web developer",
+        interests=["web development", "Web Development"],
+        experience_level="beginner",
+        completed_course_ids=[],
+    )
+    courses = [
+        _course(id="css", title="CSS Grid & Flexbox Mastery", domain="Web Development", level="beginner", skills_taught=["html-css"]),
+        _course(id="responsive", title="Responsive Web Design", domain="Web Development", level="beginner", skills_taught=["html-css"]),
+    ]
+
+    result = filter_candidates(profile, courses)
+
+    assert {c.id for c in result} == {"css", "responsive"}
+
+
 def test_filter_chains_prerequisite_through_another_matched_course_in_the_same_pass():
     # Regression test: the learner's actual target course (Node.js/Express/
     # MongoDB) requires javascript-basics, which the learner hasn't completed

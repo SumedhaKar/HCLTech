@@ -188,11 +188,22 @@ def _matches_interest(course: Course, interests_lower: set[str]) -> bool:
         return True
 
     domain_field = course.domain.lower()
+    # The broad-domain block exists to stop a domain name from being a
+    # bystander match: Gemini appends "Web Development" as grounding context
+    # even for a narrower goal like "backend", and without the block a
+    # CSS-only course would ride in on that shared domain name alone. But
+    # when the broad domain name is the LEARNER'S ONLY stated interest (e.g.
+    # interests == ["web development", "Web Development"] — the same goal,
+    # re-summarized with different casing across two Gemini calls, nothing
+    # else), there's no narrower interest left for the block to protect, and
+    # it was producing "no courses found" for a learner who asked for exactly
+    # that domain. Skip the block only in that single-interest case.
+    domain_is_sole_interest = interests_lower == {domain_field}
     for interest in interests_lower:
         if len(interest) < _MIN_MATCH_LENGTH:
             continue
         if (
-            domain_field not in _DOMAIN_MATCH_TOO_BROAD
+            (domain_field not in _DOMAIN_MATCH_TOO_BROAD or domain_is_sole_interest)
             and len(domain_field) >= _MIN_MATCH_LENGTH
             and (interest in domain_field or domain_field in interest)
         ):
