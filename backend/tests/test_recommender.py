@@ -375,6 +375,38 @@ def test_build_learning_path_returns_empty_when_no_candidates(monkeypatch: pytes
     assert path == []
 
 
+def test_build_learning_path_falls_back_to_rule_based_order_when_embeddings_fail(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    # Regression test: a Gemini embedding failure (network error, free-tier
+    # rate limit) used to propagate straight out of build_learning_path and
+    # become a hard 502 at the router — even though filter_candidates had
+    # already produced a valid, relevant candidate set on its own. The AI
+    # ranking layer must degrade, not take the whole feature down with it.
+    profile = LearnerProfile(
+        goal="become a backend engineer",
+        interests=["backend"],
+        experience_level="beginner",
+        completed_course_ids=[],
+    )
+    courses = [
+        _course(id="js", title="JS Fundamentals", domain="Web Development", level="beginner", skills_taught=["nodejs"]),
+        _course(id="sql", title="SQL Basics", domain="Programming Fundamentals", level="beginner", skills_taught=["sql-basics"]),
+    ]
+
+    from app.services.embeddings import GeminiEmbeddingError
+
+    def failing_embed_texts(texts: list[str]) -> list[list[float]]:
+        raise GeminiEmbeddingError("simulated rate limit")
+
+    monkeypatch.setattr(recommender, "embed_texts", failing_embed_texts)
+
+    path = build_learning_path(profile, courses)
+
+    assert {entry.course.id for entry in path} == {"js", "sql"}
+    assert all(entry.score == 0.0 for entry in path)
+
+
 def test_filter_matches_alias_via_whole_word_not_just_exact_interest_string():
     # Regression test: Gemini phrases the same interest inconsistently
     # ("backend", "backend development", "backend dev") — the alias table

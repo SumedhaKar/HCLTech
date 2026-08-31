@@ -18,7 +18,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import List, Optional, Tuple
 
-from app.services.embeddings import cosine_similarity, embed_texts
+import logging
+
+from app.services.embeddings import GeminiEmbeddingError, cosine_similarity, embed_texts
+
+logger = logging.getLogger(__name__)
 
 MAX_PATH_LENGTH = 6
 
@@ -434,7 +438,24 @@ def rank_candidates(profile: LearnerProfile, candidates: List[Course]) -> List[T
 
 def build_learning_path(profile: LearnerProfile, courses: List[Course]) -> List[PathEntry]:
     candidates = filter_candidates(profile, courses)
-    ranked = rank_candidates(profile, candidates)
+
+    # Embedding-similarity ranking is a real enhancement, not something the
+    # core feature should die on (see docs/adr/0003: "the AI layer is never
+    # a single point of failure"). filter_candidates has already produced a
+    # valid, relevant, prerequisite-respecting candidate set on its own — if
+    # Gemini's embedding call fails or hits a free-tier rate limit, fall back
+    # to a neutral score for every candidate instead of raising. The rest of
+    # the pipeline (specific-match priority sort, level ordering) still runs
+    # unchanged; the only thing lost is fine-grained semantic re-ranking
+    # within a tier.
+    try:
+        ranked = rank_candidates(profile, candidates)
+    except GeminiEmbeddingError:
+        logger.warning(
+            "Embedding ranking failed; falling back to rule-based ordering only.",
+            exc_info=True,
+        )
+        ranked = [(course, 0.0) for course in candidates]
 
     # A course that specifically teaches a matched skill is a stronger,
     # more trustworthy relevance signal than one that only shares a domain
