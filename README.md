@@ -30,9 +30,10 @@ Apply the schema and seed data, in order, against your Postgres instance:
 psql "<your-connection-string>" -f supabase/migrations/0001_init.sql
 psql "<your-connection-string>" -f supabase/seed/0001_courses.sql
 psql "<your-connection-string>" -f supabase/seed/0002_courses_expansion.sql
+psql "<your-connection-string>" -f supabase/seed/0003_ai_engineering_courses.sql
 ```
 
-`0001_init.sql` creates the schema and seeds one mock learner (`00000000-0000-0000-0000-000000000001`) — auth is deliberately out of scope for this build (see `docs/adr/0005-auth-deferred.md`), so every request in local dev and production acts on this one learner. The two seed files load 103 real courses across 17 domains.
+`0001_init.sql` creates the schema and seeds one mock learner (`00000000-0000-0000-0000-000000000001`) — auth is deliberately out of scope for this build (see `docs/adr/0005-auth-deferred.md`), so every request in local dev and production acts on this one learner. The three seed files load 111 real courses across 17 domains.
 
 ## 2. Backend setup
 
