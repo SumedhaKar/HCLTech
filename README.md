@@ -93,3 +93,4 @@ Run tests with `npm test`, lint with `npm run lint`, production build with `npm 
 
 - Both services must point at the **same** Postgres instance — Next.js writes/reads the learner profile and path status directly; FastAPI writes the profile from chat intake and generates the path.
 - Supabase's free tier auto-pauses after 7 days of inactivity (manual resume only), and Render's free tier cold-starts on first request after idling — expect a delay on the very first request if the deployed services have been idle.
+- If the Gemini embedding call in the recommendation engine fails (rate limit, transient error), path generation falls back to the rule-based filtered order rather than failing the request — a learner always gets a complete path.
