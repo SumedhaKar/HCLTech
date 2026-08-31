@@ -546,3 +546,50 @@ def test_filter_ignores_skill_tag_that_contains_an_unrelated_interest_as_a_subst
     result = filter_candidates(profile, courses)
 
     assert {c.id for c in result} == {"mongo"}
+
+
+def test_filter_matches_data_analysis_phrasing_variant():
+    # Regression test: reproduces a live bug found in the wild. The exact
+    # same "become a data analyst" goal was phrased by Gemini as "data
+    # analyst" on one call and "data analysis" on another (non-determinism,
+    # not user error) — "analysis" is a different word from "analyst", not
+    # a spacing/punctuation variant, so it needed its own alias key.
+    profile = LearnerProfile(
+        goal="become a data analyst",
+        interests=["data analysis", "Data Science & Machine Learning"],
+        experience_level="beginner",
+        completed_course_ids=[],
+    )
+    courses = [
+        _course(id="sql", title="Introduction to SQL", domain="Programming Fundamentals", level="beginner", skills_taught=["sql-basics"]),
+        _course(id="excel", title="Excel Skills for Business Specialization", domain="Business & Management", level="beginner", skills_taught=["excel"]),
+    ]
+
+    result = filter_candidates(profile, courses)
+
+    assert {c.id for c in result} == {"sql", "excel"}
+
+
+def test_filter_matches_web_dev_interest_despite_broad_domain_exclusion():
+    # Regression test: reproduces a live bug found in the wild. "Web
+    # Development" is deliberately excluded from bare domain-name matching
+    # (see _DOMAIN_MATCH_TOO_BROAD) so a narrower interest like "backend"
+    # can't pull in CSS-only courses from that domain — but that exclusion
+    # had the opposite of the intended effect for "web dev" itself, the one
+    # goal that legitimately wants the whole domain, and it has no alias of
+    # its own: "become a web developer" returned "No suitable courses found"
+    # entirely.
+    profile = LearnerProfile(
+        goal="become a web developer",
+        interests=["web dev", "Web Development"],
+        experience_level="beginner",
+        completed_course_ids=[],
+    )
+    courses = [
+        _course(id="css", title="CSS Grid & Flexbox Mastery", domain="Web Development", level="beginner", skills_taught=["html-css"]),
+        _course(id="node", title="Node.js, Express, MongoDB & More", domain="Web Development", level="beginner", skills_taught=["nodejs", "express"]),
+    ]
+
+    result = filter_candidates(profile, courses)
+
+    assert {c.id for c in result} == {"css", "node"}

@@ -113,6 +113,33 @@ _INTEREST_ALIASES: dict[str, tuple[str, ...]] = {
     # different domain entirely, so it never got pulled in on its own.
     "data analyst": ("sql-basics", "excel", "data-analysis", "pandas"),
     "data analytics": ("sql-basics", "excel", "data-analysis", "pandas"),
+    # Gemini phrased the identical goal as "data analyst" on one call and
+    # "data analysis" on another — a real, observed non-determinism, not a
+    # hypothetical. Neither the word-level nor the multi-word substring
+    # check bridges "analyst" and "analysis"; they're different English
+    # words, not a punctuation/spacing variant. Every phrasing actually seen
+    # gets its own key rather than trying to normalize the difference away.
+    "data analysis": ("sql-basics", "excel", "data-analysis", "pandas"),
+    # A "web dev"/"web developer" goal is at least as broad as "full stack"
+    # (it's the same skill spread in this catalog — html/css through
+    # Node/React) but has no alias of its own, and "Web Development" domain
+    # matching is deliberately blocked (see _DOMAIN_MATCH_TOO_BROAD) since a
+    # narrower interest like "backend" shouldn't pull in CSS-only courses
+    # from that domain. That block has the correct effect for "backend" but
+    # the opposite of the correct effect here — "web dev" is the one goal
+    # that legitimately wants the whole domain — so it needs its own direct
+    # route to the real skill set, same as "full stack".
+    #
+    # Deliberately does NOT include a "web development" key: Gemini always
+    # appends that exact domain name as a secondary grounding interest
+    # alongside whatever the learner actually said (see gemini_intake.py),
+    # including for narrow goals like "backend dev" — aliasing it to the
+    # full breadth of web skills would silently re-widen exactly the
+    # "backend shouldn't get CSS-only courses" case _DOMAIN_MATCH_TOO_BROAD
+    # exists to prevent. "web dev"/"web developer" are the learner's own
+    # words and don't have that collision.
+    "web dev": ("html-css", "javascript-basics", "react", "nodejs", "express", "mongodb", "sql-basics"),
+    "web developer": ("html-css", "javascript-basics", "react", "nodejs", "express", "mongodb", "sql-basics"),
 }
 
 # Domains whose courses span genuinely distinct skill clusters, so a bare
@@ -220,7 +247,23 @@ def _alias_tags_for(interest: str, skill_fields: list[str]) -> bool:
 
 
 def _alias_key_matches(alias_key: str, interest: str, interest_words: list[str]) -> bool:
-    return alias_key in interest if " " in alias_key else alias_key in interest_words
+    if " " not in alias_key:
+        return alias_key in interest_words
+    # A raw character-substring check (`alias_key in interest`) is too loose
+    # for a multi-word key: "web dev" is a literal character-prefix of "web
+    # development" (a real, distinct interest — the domain-grounding term
+    # Gemini appends alongside narrower goals like "backend"), so it would
+    # wrongly match there too. Matching on a contiguous WORD sequence
+    # instead — "dev" must be its own whole word, not the start of
+    # "development" — still catches "full stack" inside "full stack
+    # developer" (a real phrasing variant) while correctly rejecting "web
+    # dev" inside "web development".
+    key_words = alias_key.split()
+    span = len(key_words)
+    return any(
+        interest_words[i : i + span] == key_words
+        for i in range(len(interest_words) - span + 1)
+    )
 
 
 def _prerequisites_met(course: Course, known_skills: set[str]) -> bool:
