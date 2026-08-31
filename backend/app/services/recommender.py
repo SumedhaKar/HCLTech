@@ -145,9 +145,23 @@ def _matches_interest(course: Course, interests_lower: set[str]) -> bool:
             and (interest in domain_field or domain_field in interest)
         ):
             return True
-        for alias_tag in _INTEREST_ALIASES.get(interest, ()):
-            if alias_tag in skill_fields:
-                return True
+        if _alias_tags_for(interest, skill_fields):
+            return True
+    return False
+
+
+def _alias_tags_for(interest: str, skill_fields: list[str]) -> bool:
+    # Matched on whole words, not raw substring: Gemini phrases the same
+    # interest inconsistently ("backend", "backend development", "backend
+    # dev"), and the alias table only has "backend" as a key. A raw substring
+    # check (`"api" in interest`) would also wrongly fire on an unrelated
+    # interest like "capital markets", which literally contains "api" as
+    # letters 2-4 of "capital" — word-splitting avoids that false positive
+    # while still catching "backend" inside "backend development".
+    interest_words = interest.split()
+    for alias_key, alias_tags in _INTEREST_ALIASES.items():
+        if alias_key in interest_words and any(tag in skill_fields for tag in alias_tags):
+            return True
     return False
 
 
@@ -260,9 +274,15 @@ def _build_rationale(course: Course, interests_lower: set[str]) -> str:
         # reading as unrelated even when the course was chosen for exactly
         # the right reason.
         for interest in interests_lower:
-            for alias_tag in _INTEREST_ALIASES.get(interest, ()):
-                if alias_tag in skill_fields:
-                    matched = [s for s in course.skills_taught if s.lower() == alias_tag]
+            interest_words = interest.split()
+            for alias_key, alias_tags in _INTEREST_ALIASES.items():
+                if alias_key not in interest_words:
+                    continue
+                for alias_tag in alias_tags:
+                    if alias_tag in skill_fields:
+                        matched = [s for s in course.skills_taught if s.lower() == alias_tag]
+                        break
+                if matched:
                     break
             if matched:
                 break

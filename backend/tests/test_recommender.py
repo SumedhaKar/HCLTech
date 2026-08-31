@@ -348,3 +348,46 @@ def test_build_learning_path_returns_empty_when_no_candidates(monkeypatch: pytes
     path = build_learning_path(profile, courses)
 
     assert path == []
+
+
+def test_filter_matches_alias_via_whole_word_not_just_exact_interest_string():
+    # Regression test: Gemini phrases the same interest inconsistently
+    # ("backend", "backend development", "backend dev") — the alias table
+    # only has "backend" as a key, and the original exact-string lookup
+    # missed every phrasing variant except the literal word "backend" alone.
+    # This was the actual live phrasing that produced an all-frontend path
+    # for a stated "backend development" interest.
+    profile = LearnerProfile(
+        goal="become a backend dev",
+        interests=["backend development"],
+        experience_level="beginner",
+        completed_course_ids=[],
+    )
+    courses = [
+        _course(id="css", title="CSS Grid & Flexbox Mastery", domain="Web Development", level="beginner", skills_taught=["html-css"]),
+        _course(id="node", title="Node.js, Express, MongoDB & More", domain="Web Development", level="beginner", skills_taught=["nodejs", "express"]),
+    ]
+
+    result = filter_candidates(profile, courses)
+
+    assert {c.id for c in result} == {"node"}
+
+
+def test_filter_alias_word_match_does_not_false_positive_on_embedded_letters():
+    # Guard against the failure mode a naive substring check would introduce:
+    # "api" (an alias key) is literally contained in "capital" as letters
+    # 2-4 (c-API-tal). Whole-word matching must not treat "capital markets"
+    # as an API/backend interest just because those letters appear inside it.
+    profile = LearnerProfile(
+        goal="become a finance analyst",
+        interests=["capital markets"],
+        experience_level="beginner",
+        completed_course_ids=[],
+    )
+    courses = [
+        _course(id="node", title="Node.js, Express, MongoDB & More", domain="Web Development", level="beginner", skills_taught=["nodejs", "express"]),
+    ]
+
+    result = filter_candidates(profile, courses)
+
+    assert result == []
