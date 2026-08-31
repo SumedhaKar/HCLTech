@@ -85,7 +85,7 @@ Run it:
 npm run dev
 ```
 
-Open `http://localhost:3000` — start at the chat screen (`/chat`) to build a learner profile, then `/dashboard` for the generated path, `/catalog` to browse all courses, `/profile` to view/edit the profile directly.
+Open `http://localhost:3000` — start at the chat screen (`/chat`) to build a learner profile, then `/dashboard` for the generated path (per-item status, a live time-to-complete estimate, a suggested project per milestone, and a "Regenerate path" action that reflects completed work), `/catalog` to browse all courses, `/profile` to view/edit the profile directly.
 
 Run tests with `npm test`, lint with `npm run lint`, production build with `npm run build`.
 
