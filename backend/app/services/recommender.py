@@ -105,6 +105,14 @@ _INTEREST_ALIASES: dict[str, tuple[str, ...]] = {
     "full stack": ("html-css", "javascript-basics", "react", "nodejs", "express", "mongodb", "sql-basics"),
     "full-stack": ("html-css", "javascript-basics", "react", "nodejs", "express", "mongodb", "sql-basics"),
     "fullstack": ("html-css", "javascript-basics", "react", "nodejs", "express", "mongodb", "sql-basics"),
+    # A "data analyst" goal grounds to "Data Science & Machine Learning" the
+    # same non-deterministic way "full stack developer" did — and that
+    # domain's actual courses (Pandas, ML Specialization, PyTorch...) skew
+    # toward data science/ML, not the SQL and Excel a data analyst role
+    # specifically needs; SQL lives under Programming Fundamentals, a
+    # different domain entirely, so it never got pulled in on its own.
+    "data analyst": ("sql-basics", "excel", "data-analysis", "pandas"),
+    "data analytics": ("sql-basics", "excel", "data-analysis", "pandas"),
 }
 
 # Domains whose courses span genuinely distinct skill clusters, so a bare

@@ -442,3 +442,34 @@ def test_filter_excludes_programming_fundamentals_courses_that_dont_teach_a_matc
     result = filter_candidates(profile, courses)
 
     assert {c.id for c in result} == {"frontend", "sql"}
+
+
+def test_filter_matches_data_analyst_interest_to_sql_and_excel():
+    # Regression test: reproduces the live bug directly — "become a data
+    # analyst" grounds to "Data Science & Machine Learning" (Gemini's
+    # closest catalog-domain match), and that domain's real courses skew
+    # toward data science/ML (Pandas, ML Specialization, PyTorch), not what
+    # a data analyst role actually needs. SQL lives under Programming
+    # Fundamentals, a different domain, and the catalog had zero Excel
+    # content at all until it was added specifically for this gap.
+    profile = LearnerProfile(
+        goal="become a data analyst",
+        interests=["data analyst", "Data Science & Machine Learning"],
+        experience_level="beginner",
+        completed_course_ids=[],
+    )
+    courses = [
+        _course(id="sql", title="Introduction to SQL", domain="Programming Fundamentals", level="beginner", skills_taught=["sql-basics"]),
+        _course(id="excel", title="Excel Skills for Business Specialization", domain="Business & Management", level="beginner", skills_taught=["excel"]),
+        _course(id="unrelated", title="Data Structures and Algorithms Specialization", domain="Programming Fundamentals", level="intermediate", skills_taught=["algorithms", "data-structures-advanced"]),
+    ]
+
+    result = filter_candidates(profile, courses)
+
+    # "Data Science & Machine Learning"-domain courses (ML Specialization,
+    # PyTorch...) still legitimately match via that interest's own
+    # domain-fallback, unchanged and correct for an AI-engineer/data-scientist
+    # goal (see the earlier full-stack/programming-fundamentals fix) — this
+    # test isolates the specific fix: SQL and Excel, in two other domains
+    # entirely, now match too, while a genuinely unrelated course does not.
+    assert {c.id for c in result} == {"sql", "excel"}

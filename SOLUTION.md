@@ -25,7 +25,7 @@ General lifelong learners, in any domain, who know what they want to become but 
 3. **Path generation** — turns the ranked candidates into a sequenced, milestone-labeled route (Foundations → Core Skills → Advanced Practice), each item carrying a specific rationale for why it's there.
 4. **Explainer / Q&A** — a learner can ask "why this course" or "why not X instead" about any path item and get a real, specific answer, not a static tooltip.
 5. **Dashboard** — the learner's live path with per-item status (not started / in progress / completed) so progress persists across visits, plus a skill-development panel that aggregates each course's skills into "gained" (from completed items) versus "ahead on your route" (from what's left) — turning a flat course list into a visible skills trajectory, not just a checklist.
-6. **Catalog & profile** — full browse/search of all 111 seeded courses, and a direct view/edit screen for the learner's own profile, independent of the chat flow.
+6. **Catalog & profile** — full browse/search of all 112 seeded courses, and a direct view/edit screen for the learner's own profile, independent of the chat flow.
 
 ## 4. Architecture
 
@@ -81,7 +81,7 @@ The product has a documented design system (`DESIGN.md`) — "The Night Trail": 
 ```
 frontend/          Next.js app (App Router) — catalog, chat, dashboard, profile, CRUD API routes
 backend/            FastAPI app — chat intake, recommendation engine, path generator, explainer
-supabase/           Versioned SQL migrations + seed data (111 courses, 17 domains)
+supabase/           Versioned SQL migrations + seed data (112 courses, 17 domains)
 docs/adr/           Architecture decision records (0001-0006)
 docs/contract/      API contract shared between FE and BE during parallel build
 DESIGN.md           The Night Trail design system
