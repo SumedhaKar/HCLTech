@@ -266,7 +266,7 @@ export default function DashboardPage() {
                 type="button"
                 onClick={regeneratePath}
                 disabled={regenerating}
-                title="Rebuilds your path from what you've completed so far — may take up to a minute if the server's been idle."
+                title="Rebuilds your path from what you've completed so far, may take up to a minute if the server's been idle."
                 className="shrink-0 rounded-full px-4 py-2 font-mono text-[11px] uppercase tracking-wide text-text-muted ring-1 ring-border transition-colors hover:bg-surface-raised disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {regenerating ? "Regenerating…" : "Regenerate path"}
@@ -374,7 +374,7 @@ export default function DashboardPage() {
                           <li className="relative mb-4 list-none pl-14">
                             <div className="rounded-xl bg-surface-raised p-4 ring-1 ring-border">
                               <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-text-muted">
-                                Suggested project — {item.milestoneLabel}
+                                A mini project attached, Happy Learning!
                               </p>
                               <p className="mt-1.5 text-sm leading-6 text-text">
                                 {milestoneProjects!.get(item.milestoneLabel)}
