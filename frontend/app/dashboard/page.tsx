@@ -73,6 +73,25 @@ export default function DashboardPage() {
 
   const completedCount = path?.items.filter((i) => i.status === "completed").length ?? 0;
 
+  // Skills the learner has actually built (from completed items) vs. skills
+  // still ahead on the route (from everything else) — a course can teach a
+  // skill a different completed course already covered, so "ahead" excludes
+  // anything already gained rather than just grouping by item status.
+  const skillProgress = path
+    ? (() => {
+        const gained = new Set<string>();
+        const ahead = new Set<string>();
+        for (const item of path.items) {
+          const course = courses[item.courseId];
+          if (!course) continue;
+          const bucket = item.status === "completed" ? gained : ahead;
+          for (const skill of course.skillsTaught) bucket.add(skill);
+        }
+        for (const skill of gained) ahead.delete(skill);
+        return { gained: [...gained], ahead: [...ahead] };
+      })()
+    : null;
+
   return (
     <div className="flex flex-1 flex-col bg-ground text-text">
       <SiteHeader active="/dashboard" />
@@ -118,6 +137,48 @@ export default function DashboardPage() {
                 {completedCount} of {path.items.length} waypoints complete
               </p>
             </div>
+
+            {skillProgress && (skillProgress.gained.length > 0 || skillProgress.ahead.length > 0) && (
+              <div className="rounded-[20px] bg-surface p-6 ring-1 ring-border">
+                <h2 className="font-serif text-xl font-semibold text-text">Skill development</h2>
+                <div className="mt-4 flex flex-col gap-4">
+                  {skillProgress.gained.length > 0 && (
+                    <div>
+                      <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-text-muted">
+                        Gained ({skillProgress.gained.length})
+                      </p>
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {skillProgress.gained.map((skill) => (
+                          <span
+                            key={skill}
+                            className="rounded-full bg-blaze px-2.5 py-1 text-xs text-text"
+                          >
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {skillProgress.ahead.length > 0 && (
+                    <div>
+                      <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-text-muted">
+                        Ahead on your route ({skillProgress.ahead.length})
+                      </p>
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {skillProgress.ahead.map((skill) => (
+                          <span
+                            key={skill}
+                            className="rounded-full bg-surface-raised px-2.5 py-1 text-xs text-text-muted ring-1 ring-border"
+                          >
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             <ol className="mt-4 flex flex-col">
               {path.items
