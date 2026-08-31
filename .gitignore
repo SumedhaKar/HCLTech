@@ -16,3 +16,9 @@ backend/.env
 .impeccable/questions/
 .impeccable/sketches/
 .impeccable/live/
+
+# internal build tooling — not part of the submitted product
+.scratch
+CLAUDE.md
+frontend/CLAUDE.md
+.claude/
