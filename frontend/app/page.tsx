@@ -6,7 +6,7 @@ const HERO_VIDEO_SRC = "/hero-video.mp4";
 
 const STATS = [
   {
-    label: "103 real courses across 17 domains",
+    label: "112 real courses across 17 domains",
     icon: (
       <svg className={styles.statIcon} viewBox="0 0 24 24" aria-hidden>
         <defs>

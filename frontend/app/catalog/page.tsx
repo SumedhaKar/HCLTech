@@ -92,7 +92,7 @@ export default function CatalogPage() {
             Course catalog
           </h1>
           <p className="text-sm leading-6 text-text-muted">
-            103 real courses, the same set PathFinder draws routes from. Browse
+            112 real courses, the same set PathFinder draws routes from. Browse
             directly, or{" "}
             <Link
               href="/chat"
