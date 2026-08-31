@@ -391,3 +391,54 @@ def test_filter_alias_word_match_does_not_false_positive_on_embedded_letters():
     result = filter_candidates(profile, courses)
 
     assert result == []
+
+
+def test_filter_matches_full_stack_interest_across_frontend_backend_and_database():
+    # Regression test: a "full stack developer" goal previously returned
+    # nothing at all — Gemini's non-deterministic domain-grounding landed on
+    # "Web Development" (blocked from bare domain matching, so nothing
+    # matched) on one call and "Programming Fundamentals" (not blocked, so
+    # unrelated CS-fundamentals courses flooded in) on another, for the exact
+    # same input. A direct "full stack" alias removes that domain-grounding
+    # lottery entirely.
+    profile = LearnerProfile(
+        goal="become a full stack developer",
+        interests=["full stack development", "Web Development"],
+        experience_level="beginner",
+        completed_course_ids=[],
+    )
+    courses = [
+        _course(id="frontend", title="Full Stack JavaScript", domain="Web Development", level="beginner", skills_taught=["html-css", "javascript-basics"]),
+        _course(id="backend", title="Node.js, Express, MongoDB & More", domain="Web Development", level="intermediate", skills_taught=["nodejs", "express", "mongodb"], prerequisite_skills=["javascript-basics"]),
+        _course(id="sql", title="Introduction to SQL", domain="Programming Fundamentals", level="beginner", skills_taught=["sql-basics"]),
+        _course(id="unrelated-cs", title="CS50", domain="Programming Fundamentals", level="beginner", skills_taught=["c", "algorithms"]),
+    ]
+
+    result = filter_candidates(profile, courses)
+
+    assert {c.id for c in result} == {"frontend", "backend", "sql"}
+
+
+def test_filter_excludes_programming_fundamentals_courses_that_dont_teach_a_matched_skill():
+    # Regression test: reproduces the live bug directly — a "full stack
+    # developer" goal, domain-grounded to "Programming Fundamentals" instead
+    # of "Web Development" on that particular call, matched every unrelated
+    # course in that domain (CS50, Git/GitHub, Java OOP...) via bare
+    # domain-name equality and crowded out the real Web Development/database
+    # content entirely.
+    profile = LearnerProfile(
+        goal="become a full stack developer",
+        interests=["full stack development", "Programming Fundamentals"],
+        experience_level="beginner",
+        completed_course_ids=[],
+    )
+    courses = [
+        _course(id="cs50", title="CS50", domain="Programming Fundamentals", level="beginner", skills_taught=["c", "algorithms"]),
+        _course(id="git", title="Git and GitHub for Beginners", domain="Programming Fundamentals", level="beginner", skills_taught=["version-control"]),
+        _course(id="frontend", title="Full Stack JavaScript", domain="Web Development", level="beginner", skills_taught=["html-css", "javascript-basics"]),
+        _course(id="sql", title="Introduction to SQL", domain="Programming Fundamentals", level="beginner", skills_taught=["sql-basics"]),
+    ]
+
+    result = filter_candidates(profile, courses)
+
+    assert {c.id for c in result} == {"frontend", "sql"}

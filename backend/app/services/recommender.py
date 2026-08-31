@@ -95,22 +95,42 @@ _INTEREST_ALIASES: dict[str, tuple[str, ...]] = {
     "back-end": ("nodejs", "express", "mongodb", "sql-basics"),
     "frontend": ("html-css", "react", "javascript-basics", "typescript"),
     "front-end": ("html-css", "react", "javascript-basics", "typescript"),
+    # A "full stack" goal spans frontend, backend, and database at once — no
+    # single existing alias covers that, and it doesn't reliably land on one
+    # catalog domain either (Gemini's domain-grounding for "full stack
+    # developer" has landed on both "Web Development" and "Programming
+    # Fundamentals" across otherwise-identical calls). Mapping it directly to
+    # the real cross-cutting skill set removes that non-determinism instead
+    # of depending on it.
+    "full stack": ("html-css", "javascript-basics", "react", "nodejs", "express", "mongodb", "sql-basics"),
+    "full-stack": ("html-css", "javascript-basics", "react", "nodejs", "express", "mongodb", "sql-basics"),
+    "fullstack": ("html-css", "javascript-basics", "react", "nodejs", "express", "mongodb", "sql-basics"),
 }
 
-# Domains whose courses span genuinely distinct skill clusters — Web
-# Development contains courses that are pure frontend (CSS Grid & Flexbox,
-# skills=["html-css"]) alongside courses that are backend/full-stack
-# (Node.js/Express/MongoDB). A bare domain-name match is too weak a
-# relevance signal here: it let a Gemini-appended "Web Development" grounding
-# interest (added for a "backend dev" goal, since the catalog's domain list
-# has no narrower "Backend" bucket) pull in CSS-only courses that have
-# nothing to do with backend work. Contrast with a domain like Law, where
-# every course genuinely is about law regardless of its specific skill tag —
-# domain-fallback matching stays valid there. Skip the fallback only for
-# domains on this list; skill-tag and alias matching still apply as normal,
-# so a genuinely relevant course (one that actually teaches a matched skill)
-# is unaffected.
-_DOMAIN_MATCH_TOO_BROAD = {"web development"}
+# Domains whose courses span genuinely distinct skill clusters, so a bare
+# domain-name match is too weak a relevance signal on its own — contrast
+# with a domain like Law, where every course genuinely is about law
+# regardless of its specific skill tag, so domain-fallback matching stays
+# valid there. Skip the fallback only for domains on this list; skill-tag
+# and alias matching still apply as normal, so a genuinely relevant course
+# (one that actually teaches a matched skill) is unaffected.
+#
+# "web development" — contains courses that are pure frontend (CSS Grid &
+# Flexbox, skills=["html-css"]) alongside backend/full-stack ones (Node.js/
+# Express/MongoDB). A Gemini-appended "Web Development" grounding interest
+# (added for a "backend dev" goal, since the catalog's domain list has no
+# narrower "Backend" bucket) let CSS-only courses ride in on it.
+#
+# "programming fundamentals" — bundles CS50 (C/algorithms), Python for
+# Everybody, JS Algorithms & Data Structures, Git/GitHub, a DSA
+# specialization, and Java OOP: six unrelated languages/topics under one
+# domain name. A "full stack developer" goal that happened to get
+# domain-grounded here (rather than to Web Development, on a different
+# Gemini call for the identical input) matched every course in the domain
+# and crowded out the actually-relevant Web Development/database content
+# entirely — the same failure mode as Web Development, on a different
+# domain, from the exact same underlying cause.
+_DOMAIN_MATCH_TOO_BROAD = {"web development", "programming fundamentals"}
 
 
 def _matches_interest(course: Course, interests_lower: set[str]) -> bool:
@@ -151,18 +171,30 @@ def _matches_interest(course: Course, interests_lower: set[str]) -> bool:
 
 
 def _alias_tags_for(interest: str, skill_fields: list[str]) -> bool:
-    # Matched on whole words, not raw substring: Gemini phrases the same
-    # interest inconsistently ("backend", "backend development", "backend
-    # dev"), and the alias table only has "backend" as a key. A raw substring
-    # check (`"api" in interest`) would also wrongly fire on an unrelated
-    # interest like "capital markets", which literally contains "api" as
-    # letters 2-4 of "capital" — word-splitting avoids that false positive
-    # while still catching "backend" inside "backend development".
+    # Single-word keys are matched on whole words, not raw substring: Gemini
+    # phrases the same interest inconsistently ("backend", "backend
+    # development", "backend dev"), and the alias table only has "backend" as
+    # a key. A raw substring check (`"api" in interest`) would also wrongly
+    # fire on an unrelated interest like "capital markets", which literally
+    # contains "api" as letters 2-4 of "capital" — word-splitting avoids that
+    # false positive while still catching "backend" inside "backend
+    # development".
+    #
+    # A multi-word key (e.g. "full stack") can never equal a single element
+    # of that word list, so it's matched as a substring of the whole interest
+    # instead — safe for a multi-word phrase, since unlike a short single
+    # token it can't accidentally hide inside an unrelated single word.
     interest_words = interest.split()
     for alias_key, alias_tags in _INTEREST_ALIASES.items():
-        if alias_key in interest_words and any(tag in skill_fields for tag in alias_tags):
+        if _alias_key_matches(alias_key, interest, interest_words) and any(
+            tag in skill_fields for tag in alias_tags
+        ):
             return True
     return False
+
+
+def _alias_key_matches(alias_key: str, interest: str, interest_words: list[str]) -> bool:
+    return alias_key in interest if " " in alias_key else alias_key in interest_words
 
 
 def _prerequisites_met(course: Course, known_skills: set[str]) -> bool:
@@ -276,7 +308,7 @@ def _build_rationale(course: Course, interests_lower: set[str]) -> str:
         for interest in interests_lower:
             interest_words = interest.split()
             for alias_key, alias_tags in _INTEREST_ALIASES.items():
-                if alias_key not in interest_words:
+                if not _alias_key_matches(alias_key, interest, interest_words):
                     continue
                 for alias_tag in alias_tags:
                     if alias_tag in skill_fields:
