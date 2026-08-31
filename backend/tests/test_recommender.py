@@ -219,6 +219,67 @@ def test_filter_matches_generic_interest_words_via_alias_to_specific_tags():
     assert {c.id for c in result} == {"node", "sql"}
 
 
+def test_filter_excludes_broad_domain_courses_that_dont_teach_a_matched_skill():
+    # Regression test: a "become a backend dev" goal gets "Web Development"
+    # appended as a Gemini-grounded interest (gemini_intake.py's domain
+    # taxonomy has no narrower "Backend" bucket). Web Development contains
+    # both pure-frontend and backend/full-stack courses, so a bare
+    # domain-name match let CSS-only courses ride in on that grounding
+    # interest even though they teach nothing backend-related. Skill-tag/
+    # alias matching must still work for real backend content in that domain.
+    profile = LearnerProfile(
+        goal="become a backend dev",
+        interests=["backend", "web development"],
+        experience_level="beginner",
+        completed_course_ids=[],
+    )
+    courses = [
+        _course(id="css", title="CSS Grid & Flexbox Mastery", domain="Web Development", level="beginner", skills_taught=["html-css"]),
+        _course(id="responsive", title="Responsive Web Design", domain="Web Development", level="beginner", skills_taught=["html-css"]),
+        _course(id="fullstack", title="Full Stack JavaScript", domain="Web Development", level="beginner", skills_taught=["html-css", "javascript-basics", "nodejs"]),
+    ]
+
+    result = filter_candidates(profile, courses)
+
+    assert {c.id for c in result} == {"fullstack"}
+
+
+def test_filter_chains_prerequisite_through_another_matched_course_in_the_same_pass():
+    # Regression test: the learner's actual target course (Node.js/Express/
+    # MongoDB) requires javascript-basics, which the learner hasn't completed
+    # yet. The old hard-exclusion dropped it from the path entirely, even
+    # though a foundations course teaching that exact prerequisite was
+    # already being included in the same pass — the destination course
+    # should still appear, sequenced after what unlocks it, not vanish.
+    profile = LearnerProfile(
+        goal="become a backend dev",
+        interests=["backend"],
+        experience_level="beginner",
+        completed_course_ids=[],
+    )
+    courses = [
+        _course(
+            id="js-foundations",
+            title="Full Stack JavaScript",
+            domain="Web Development",
+            level="beginner",
+            skills_taught=["html-css", "javascript-basics"],
+        ),
+        _course(
+            id="node",
+            title="Node.js, Express, MongoDB & More",
+            domain="Web Development",
+            level="intermediate",
+            skills_taught=["nodejs", "express", "mongodb"],
+            prerequisite_skills=["javascript-basics"],
+        ),
+    ]
+
+    result = filter_candidates(profile, courses)
+
+    assert {c.id for c in result} == {"js-foundations", "node"}
+
+
 def test_build_learning_path_ranks_by_similarity_and_orders_by_level(monkeypatch: pytest.MonkeyPatch):
     profile = LearnerProfile(
         goal="become a data analyst",
